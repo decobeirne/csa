@@ -260,9 +260,6 @@ def editfarm():
         os.chdir(TPL_DIR)
         data_dir = os.path.join(os.pardir, 'data')
         
-        import sys
-        flash_message(sys.version)
-        
         farmname = request.get_cookie('farmname')
         json_file = os.path.join(data_dir, '%s.json' % farmname)
         if os.path.isfile(json_file):
