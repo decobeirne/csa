@@ -1,0 +1,473 @@
+/*
+ *
+ * Containers
+ *
+ */
+#top-level-container {
+    margin: auto;
+    width: 80%;
+    max-width: 818px;
+    visibility: hidden;  /* Hide until everything is loaded to avoid jitter. */
+}
+
+#banner-container-top {
+    /* The original #00FF00 was a bit mad looking, so I reduced the brightness a bit. */
+    border-bottom: 6px solid #92E027;
+}
+
+#banner-container-bottom {
+    border-top: 6px solid #92E027;
+}
+
+#heading-container {
+    text-align: center;
+    margin: auto;
+}
+
+#links-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #92E027;
+    margin-top: 20px;  /* TODO: Possibly remove. Margin between the link and the heading, to avoid clicking the link to home.html */
+}
+
+.body-container {
+    /* This a class so that it doesn't take preference over classes nested under it */
+    margin-bottom: 40px;  /* Padding at the bottom of the body of text */
+}
+
+.instagram-container-large, .instagram-container-small, .slideshow-container {
+    margin-top: 40px;  /* Similar space to that above a h2 */
+}
+
+.profile-flex-container {
+    display: -webkit-flex;
+    display: flex;
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.profile-img-container {
+    margin-bottom: 20px;
+}
+
+.profile-left-container {
+    /* old */
+    width: 40%;
+}
+
+.profile-right-container {
+    width: 60%;
+}
+
+.profile-info-container {
+    /* new */
+    width: 40%;
+}
+
+.profile-desc-container {
+    width: 60%;
+    display: none;
+}
+
+.profile-map-container {
+    /* old */
+    margin-bottom:  20px;
+}
+
+.non-selectable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.non-selectable:hover {
+    cursor: pointer;
+}
+
+
+/*
+ *
+ * Paragraphs
+ *
+ */
+p {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+
+#heading-container h1 {
+    margin-top: 20px;  /* Corresponds with margin-top of the links-container that sits below the heading. */
+    margin-bottom: 0px;  /* TODO: Possibly remove. Reduce margin below to avoid clicking the link to home.html */
+}
+
+p.footnote {
+    padding-top: 20px;  /* Extra padding above a footnote */
+}
+
+.body-container p, .body-container ol {
+    padding-left: 80px;
+    padding-right: 80px;
+    padding-bottom:  20px;
+    text-align: justify;
+}
+
+.body-container h3 {
+    padding-left: 80px;  /* More readable when these are a little to the left. */
+    padding-right: 80px;
+}
+
+.no-indent-container p {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.profile-flex-container p {
+    margin-top: 0px;  /* Override default in order to align with image in other column */
+}
+
+.profile-left-container p {
+    /* old */
+    padding-left: 0px;  /* Override */
+    padding-right: 0px;  /* Override */
+    padding-bottom: 0px;  /* Override. Already have an auto margin below, so don't need padding between these short paragraphs */
+    text-align: left;
+    word-wrap: break-word;
+}
+
+.profile-right-container p {
+    /* old */
+    padding-left: 40px;  /* Override */
+    padding-right: 0px;  /* Override */
+}
+
+.profile-misc-container p {
+    /* new */
+    padding-left: 0px;  /* Override */
+    padding-right: 0px;  /* Override */
+    padding-bottom: 0px;  /* Override. Already have an auto margin below, so don't need padding between these short paragraphs */
+    text-align: left;
+    word-wrap: break-word;
+}
+
+.profile-desc-container p {
+    /* new */
+    padding-left: 0px;  /* Override */
+    padding-right: 0px;  /* Override */
+}
+
+li {
+    margin-bottom: 20px;
+}
+
+/*
+ *
+ * Images
+ *
+ */
+.profile-container img {
+    /* margin-top: 20px; */
+}
+
+.banner-img {
+    width: 80%;  /* TODO: Review. Make the top and bottom banner images slightly smaller, as they take up a lot of screen space. */
+    margin: auto;
+}
+
+img {
+    display: block;
+    width: 100%;
+}
+
+/*
+ *
+ * Links
+ *
+ */
+a {
+    color: #ADAFB2;
+    text-decoration: none;  /* Override underline */
+}
+
+a:hover {
+     color: #92E027;
+}
+
+.link-item, .active-link-item {
+    padding: 10px;
+    font-family: "Work Sans";
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.link-item a {
+    color: #ADAFB2;
+}
+
+.link-item:hover a {
+    color: #92E027;  /* This changes the link color when the div is hovered over, not just the link within it */
+}
+
+.active-link-item {
+    color: #2A5D4C;
+}
+
+/*
+ *
+ * Fonts
+ *
+ */
+.footnote {
+    font-weight: 100;
+    color: #707572;
+}
+
+.profile-info-key {
+    font-family: "Playfair Display";
+    font-weight: bold;
+    font-size: 17px;
+    color: #2A5D4C;
+}
+
+.profile-info-value {
+    font-family: "Work Sans";
+    font-weight: 400;
+    font-size: 14px;
+    color: #ADAFB2;
+}
+
+.email-span {
+    color: #ADAFB2;  /* Make the same color as a link */
+}
+
+.map-text, .map-link {
+    font-family: "Work Sans";
+}
+
+.map-text {
+    font-size: 11px;
+    fill: #2A5D4C;
+}
+
+.map-link {
+    font-size: 12px;
+    fill: #ADAFB2;  /* Match regular HTML links */
+}
+
+.map-link:hover {
+    fill: #92E027;
+}
+
+h1 {
+    font-family: "Playfair Display";
+    font-size: 56px;
+    font-weight: 300;
+    color: #2A5D4C;
+    text-transform: uppercase;
+}
+
+h2 {
+    font-family: "Playfair Display";
+    font-size: 30px;
+    font-weight: 500;
+    color: #2A5D4C;
+    border-bottom: 1px solid #92E027;
+}
+
+h3 {
+    font-family: "Playfair Display";
+    font-size: 22px;
+    font-weight: 600;
+    color: #2A5D4C;
+    margin-bottom: 0px;
+}
+
+u {  /* Changes the behaviour of <u></u> tags. */
+    text-decoration: none;
+    border-bottom: 1px solid #92E027;
+}
+
+/* p, ol, form { */
+p, ol {
+    font-family: "Work Sans";
+    font-size: 17px;
+    color: #484B49;
+}
+
+/*
+ *
+ * Admin
+ *
+ */
+textarea {
+    box-sizing: border-box;
+    resize: none;
+    /* white-space: pre-wrap; */
+}
+
+input {
+    width: 100%;
+}
+
+
+
+/*
+ *
+ * SVG
+ *
+ */
+.dummy-canvas { /* Required to resize on IE. */
+    display: block;
+    width: 100%;
+    visibility: hidden;
+}
+
+svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+circle {
+    fill: #504416; /* brown */
+    stroke: #504416;
+    stroke-width: 0.6;
+    display: block;
+    cursor: pointer;
+}
+
+.map-circle-active {
+    fill: #92E027; /* lime */
+}
+
+.tooltip-background {
+    fill: white;
+    stroke: none;
+    opacity: 0.8;
+}
+
+
+/*
+ *
+ * Slideshow
+ *
+ */
+.slideshow-container{
+    position: relative;  /* Necessary to allow absolute positioning of text on the image */
+    display: block;
+    overflow: hidden;
+    margin-bottom: 40px;
+    height: 400px;
+    line-height: 400px;  /* Should be same as height, in order to align imgs vertically. Is checked in JS anyway. */
+    text-align: center;  /* Aligns imgs horizonally */
+}
+
+figure{
+    position: absolute;
+    opacity: 0;
+    
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+
+figure img{  /* Overrides values set for regular imgs */
+    width: auto;
+    height: auto;
+    max-height: 400px;  /* Should be the same as the container height. Is checked by JS */
+    max-width: 100%;
+    display: inline-block;  /* To align vertically */
+    vertical-align: middle;
+}
+
+.vertical-align-span{
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+figcaption{
+    line-height: 1em;
+    
+    font-family: "Playfair Display";
+    font-weight: 200;
+    font-style: italic;
+    font-size: 1.5em;
+    color: #FFFFFF;
+
+    padding-top: 0.15em;
+    padding-right: 0.6em;
+    padding-bottom: 0.3em;
+    padding-left: 0.6em;
+
+    position: absolute;
+    bottom: 0em;
+    right: 0em;
+    background: rgba(0,0,0, .65);
+    color: #FFF;
+}
+
+figcaption a{
+    color: #FFF;
+}
+
+figure.show{
+    opacity: 1;
+    position: static;
+}
+
+.next, .prev, .pause{
+    line-height: 1em;
+    
+    font-family: "Gadugi";
+    font-weight: 100;
+    color: #FFF;
+    background: rgba(0,0,0, .6);
+    opacity: .2;
+    
+    position: absolute;
+    z-index: 1;
+}
+
+.next:hover, .prev:hover, .pause:hover{
+    opacity: 1;
+}
+
+.pause{
+    font-size: 1em;
+    bottom: 0em;
+    left: 0em;
+    padding: 0.2em 0.4em 0.4em 0.4em;
+}
+
+.next, .prev{
+    font-size: 2em;
+    top: 50%;
+    margin-top: -.75em;
+    padding: 0.3em 0.3em 0.6em 0.3em;
+}
+
+.next{
+    right: 0;
+}
+
+.prev{
+    left: 0;
+}
+
+
+
+
+
+
+
+
+
+
