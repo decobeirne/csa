@@ -1,7 +1,8 @@
 {
-"order": ["title", "image", "info", "desc"],
+"order": ["title", "images", "info", "description"],
 "title": "The name of your CSA",
-"image": "One or more images to appear in a slideshow, with optional captions. Large images make the page much slower to load, so it's great if the images can be scaled down to the size they would be on a computer screen (can scale with Microsoft Paint for example)",
+"images": "One or more images to appear in a slideshow, with optional captions. Large images make the page much slower to load, so it's great if the images can be scaled down to the size they would be on a computer screen (can scale with Microsoft Paint for example)",
 "info": "Key-value pairs providing information about the CSA",
-"desc": "One or more paragraphs describing the CSA. Paragraphs are easier to read if kept to around 100 words or less."
+"description": "One or more paragraphs describing the CSA. Paragraphs are easier to read if kept to around 100 words or less.",
+"textarea-inputs": ["description"]
 }
