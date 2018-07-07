@@ -120,8 +120,9 @@ p.footnote {
 }
 
 .body-container h3 {
-    padding-left: 80px;  /* More readable when these are a little to the left. */
-    padding-right: 80px;
+    /* More readable when these are a little to the left. */
+    /* padding-left: 80px; */
+    /* padding-right: 80px; */
 }
 
 .no-indent-container p {

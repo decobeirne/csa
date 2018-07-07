@@ -57,7 +57,7 @@ window.onload = setup;
                             % else:
                                 <!-- If not a list then must be a string, e.g. the paragraphs under "desc" -->
                                 <div class="input-container">
-                                    <input type="text" name="{{subkey}}">
+                                    <input type="text" name="{{subkey}}" value="{{subvalue}}">
                                 </div>
                             % end
                         

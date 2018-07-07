@@ -7,9 +7,8 @@ var setup = function() {
 window.onload = setup;
 </script>
 
-<p>login adsfasdfasfadsf</p>
+<p>Admin login</p>
 
-<p>foo: {{foo}}</p>
 
 
 <form method="post" action="login">

@@ -8,14 +8,11 @@ window.onload = setup;
 </script>
 
 
-<p>
-admin
-<br>
-{{data}}
-<br>
-user is {{user}}
-
-</p>
+% for farm in farms:
+    <div>
+        <p>Cloughjordan <a href="editfarm/{{farm}}">Edit</a></p>
+    </div>
+% end
 
 <p>
 <a href="logout">logout</a>
