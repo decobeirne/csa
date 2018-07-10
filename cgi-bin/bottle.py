@@ -203,19 +203,7 @@ class lazy_attribute(object):
 
 
 
-###############################################################################
-# Flash ########################################################################
-###############################################################################
-# def _flash_message(msg, remote_ip):
-    # """
-    # Customization by declan.obeirne.
-    
-    # Currently only added to SimpleTemplate.render
-    # """
-    # fd = open("flash_%s.txt" % remote_ip, "a")
-    # fd.write(msg)
-    # fd.write("\n")
-    # fd.close()
+
 
 
 ###############################################################################
@@ -2123,7 +2111,7 @@ class ConfigDict(dict):
         while stack:
             prefix, source = stack.pop()
             if not isinstance(source, dict):
-                raise TypeError('Source is not a dict (%r)' % type(source))
+                raise TypeError('Source is not a dict (r)' % type(key))
             for key, value in source.items():
                 if not isinstance(key, basestring):
                     raise TypeError('Key is not a string (%r)' % type(key))
@@ -3412,33 +3400,10 @@ class SimpleTemplate(BaseTemplate):
             del _stdout[:] # clear stdout
             return self._include(env, subtpl, **rargs)
         return env
-#
-    # def _get_flash_messages(self, env):
-        # msgs = []
-        # flash_messages_file = os.path.join()
-        # if os.path.isfile("flash.txt"):
-            # fd = open("flash.txt", "r")
-            # msgs = fd.readlines()
-            # fd.close()
-            # env.update({'flash_messages': ["yes file", os.getcwd()]})
-        # else:
-            # env.update({'flash_messages': ["no file", os.getcwd()]})
-        # if msgs:
-            # fd = open("flash.txt", "w")
-            # fd.write("")
-            # fd.close()
-            # env.update({'flash_messages': msgs})
-            # return True
-        # else:
-            # #env.update({'flash_messages': ["no msgs"]})
-            # return False
-#
+
     def render(self, *args, **kwargs):
         """ Render the template using keyword arguments as local variables. """
         env = {}; stdout = []
-        # id = kwards.pop('id', None)
-        # if id:
-            # self._get_flash_messages(id)
         for dictarg in args: env.update(dictarg)
         env.update(kwargs)
         self.execute(stdout, env)
@@ -3694,6 +3659,7 @@ jinja2_view = functools.partial(view, template_adapter=Jinja2Template)
 ###############################################################################
 # Constants and Globals ########################################################
 ###############################################################################
+
 
 TEMPLATE_PATH = ['./', './views/']
 TEMPLATES = {}

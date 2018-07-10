@@ -28,6 +28,7 @@
                 % end
             </div>
             <div class="body-container">
+                <p class="flash">Counter is {{counter}}</p>
                 % for msg in flash_messages:
                     <p class="flash">{{msg}}</p>
                 % end

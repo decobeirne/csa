@@ -161,15 +161,17 @@ def write_to_session(key, value):
     return value
 
 
-def read_from_session(key, value):
+def read_from_session(key, type="str"):
     s = get_session()
-    return s[key]
+    if type == "int":
+        return s.get(key, 0)
+    return s.get(key, "")
 
 
 """
 Rendering
 """
-def debug_msg(msg):
+def debug_msg(msg):  # TODO: delete
     cwd = os.getcwd()
     try:
         os.chdir(TMP_DIR)
@@ -182,21 +184,23 @@ def debug_msg(msg):
 #
 
 def get_flash_messages():
-    debug_msg("msgs cookie when retrieving is '%s'" % bottle.request.get_cookie('msgs', ''))
-    msgs = bottle.request.get_cookie('msgs', '').split('$')
-    bottle.response.set_cookie('msgs', '')
-    return [x for x in msgs if x]
+    s = get_session()
+    flash_messages_str = s.get("flash-messages", "")
+    s['flash-messages'] = ""
+    s.save()
+    debug_msg("going to render messages: " + flash_messages_str)
+    return flash_messages_str.split("$")
 #
 
 def flash_message(msg):
-    debug_msg("msgs cookie before msg is '%s'" % bottle.request.get_cookie('msgs', ''))
-    debug_msg("msgs cookie before ms2 is '%s'" % bottle.request.get_cookie('msgs', ''))
-    current_str = bottle.request.get_cookie('msgs', '')
-    if current_str:
-        current_str += '$'
-    current_str += msg
-    bottle.response.set_cookie('msgs', current_str)
-    debug_msg("msgs cookie after msg is '%s'" % bottle.request.get_cookie('msgs', ''))
+    s = get_session()
+    flash_messages_str = read_from_session("flash-messages")
+    if flash_messages_str:
+        flash_messages_str += '$' + msg
+    else:
+        flash_messages_str = msg
+    debug_msg("flash msgs are: " + flash_messages_str)
+    write_to_session("flash-messages", flash_messages_str)
 #
 
 def flash_debug(msg):  # TODO delete
@@ -214,7 +218,14 @@ def render_template(name, **kwargs):
         if not os.path.isfile(tpl_name):
             return "Error"  # TODO
         tpl = SimpleTemplate(source=open(tpl_name).read())
-        kwargs.update({'page_name': name, 'links': LINKS, 'flash_messages': get_flash_messages()})
+        
+        s = bottle.request.environ.get('beaker.session')
+        s['test'] = s.get('test', 0) + 1
+        s.save()
+        counter = s['test']
+        
+        
+        kwargs.update({'page_name': name, 'links': LINKS, 'flash_messages': get_flash_messages(), 'counter': counter})
         return tpl.render(**kwargs)
     finally:
         os.chdir(cwd)
@@ -226,23 +237,19 @@ def render_template(name, **kwargs):
 """
 Very simple authentication
 """
-
 def get_id():
-    id = bottle.request.get_cookie("id", None)
+    id = read_from_session("id")
     if not id:
         id = str(uuid.uuid4())
-        bottle.response.set_cookie("id", id)
+        write_to_session("id", id)
         flash_message("new id:" + id)
     else:
         flash_message("old id:" + id)
     return id
 #
 
-
 def write_login(id, username, login_time):
     """
-    There is no session (afaik), so save a uuid in a cookie, and match this against
-    a file stored on disk for basic authentication.
     """
     cwd = os.getcwd()
     try:
@@ -269,8 +276,7 @@ def delete_login(username):
 #
 
 def check_user():
-    username = bottle.request.get_cookie('username', None)
-    #farms = request.get_cookie('username', '').split('+') # TODO del
+    username = read_from_session("username")
     id = get_id()
     filename = 'login_%s.txt' % username
     cwd = os.getcwd()
@@ -283,13 +289,21 @@ def check_user():
                     expiry_time = int(vals[2][7:])
                     current_time = int(time.time())
                     if current_time < expiry_time:
+                        debug_msg("Logged in as <b>%s</b>" % username)
+                        flash_message("Logged in as <b>%s</b>" % username)
                         return True
+                    else:
+                        debug_msg("Session has expired")
+                        flash_message("Session has expired")
     except Exception as exc:
+        debug_msg("exp checking user: %s" % exc)
         flash_debug("exp checking user: %s" % exc)
         return False
     finally:
         os.chdir(cwd)
-    flash_debug("login for %s, %s failed" % (username, id))
+    if username:
+        debug_msg("Authentication for <b>%s</b> %s failed" % (username, id))  # TODO
+        flash_debug("Authentication for <b>%s</b> %s failed" % (username, id))  # TODO
     return False
 #
 
@@ -315,22 +329,28 @@ def authenticate(username, password):
             else:
                 if "farm" in db[username]:
                     farms.append(db[username]["farm"])
+            id = str(uuid.uuid4())
             
-            bottle.response.set_cookie('username', username)
-            bottle.response.set_cookie('role', role)
-            bottle.response.set_cookie('farms', "+".join(farms))
-            id = get_id()
+            s = get_session()
+            s['username'] = username
+            s['role'] = role
+            s['farms'] = "+".join(farms)
+            s['id'] = id
+            s.save()
+
             write_login(id, username, int(time.time()))
             return db[username]
     return None
 #
 
 def signout():
-    bottle.response.delete_cookie('username')
-    bottle.response.delete_cookie('role')
-    bottle.response.delete_cookie('farms')
-    bottle.response.delete_cookie('id')
-
+    s = get_session()
+    username = s.get("username", "")
+    if username:
+        flash_message("Signed out %s" % username)
+    s['username'] = ""
+    s['role'] = ""
+    s['farms'] = ""
 
 
 # Ref: http://flask.pocoo.org/docs/0.12/patterns/viewdecorators/
@@ -340,7 +360,11 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not check_user():
-            return render_login()
+            debug_msg("check failed so redirecting")
+            flash_message("check failed so redirecting")
+            redirect('/Development20180422_frameworks/login')
+        debug_msg("check was ok")
+        flash_message("check was ok")
         return f(*args, **kwargs)
     return decorated_function
 #
@@ -412,13 +436,19 @@ def render_editfarm(farmname):
 #
 
 def render_admin():
-    debug_msg("farms cookie is: '%s'" % bottle.request.get_cookie('farms', ''))
-    debug_msg("role cookie is: '%s'" % bottle.request.get_cookie('profile', ''))
-    debug_msg("username cookie is: '%s'" % bottle.request.get_cookie('username', ''))
-    debug_msg("id cookie is: '%s'" % bottle.request.get_cookie('id', ''))
-    debug_msg("msgs cookie is: '%s'" % bottle.request.get_cookie('msgs', ''))
+    # debug_msg("farms cookie is: '%s'" % bottle.request.get_cookie('farms', ''))
+    # debug_msg("role cookie is: '%s'" % bottle.request.get_cookie('profile', ''))
+    # debug_msg("username cookie is: '%s'" % bottle.request.get_cookie('username', ''))
+    # debug_msg("id cookie is: '%s'" % bottle.request.get_cookie('id', ''))
+    # debug_msg("msgs cookie is: '%s'" % bottle.request.get_cookie('msgs', ''))
     
-    farms = bottle.request.get_cookie('farms', '').split('+')
+    # debug_msg("farms cookie is: '%s'" % read_from_session("farms"))
+    # debug_msg("role cookie is: '%s'" % read_from_session("role"))
+    # debug_msg("username cookie is: '%s'" % read_from_session("username"))
+    # debug_msg("id cookie is: '%s'" % read_from_session("id"))
+    # debug_msg("flash-messages cookie is: '%s'" % read_from_session("flash-messages"))
+    
+    farms = read_from_session('farms').split('+')
     return render_template('admin', farms=farms)
     # try:
         # cwd = os.getcwd()
@@ -478,7 +508,11 @@ def editfarm(farmname):
 @route('/admin')
 @login_required
 def admin():
-    return render_admin()
+    debug_msg("ok to go to admin")
+    flash_message("ok to go to admin")
+    farms = read_from_session('farms').split('+')
+    return render_template('admin', farms=farms)
+    # return render_admin()
 #
 
 """
