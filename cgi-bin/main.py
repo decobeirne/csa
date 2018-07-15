@@ -7,17 +7,18 @@ import os
 
 # Use cgitb.handler() under an except block
 # Ref: http://cgi.tutorial.codepoint.net/debugging
-import cgitb
-cgitb.enable()
+# import cgitb
+# cgitb.enable()
 
 import bottle
-from bottle import route, get, post, run, request, response, template, SimpleTemplate, static_file, url, redirect, flash_message
+from bottle import route, get, post, run, request, response, template, SimpleTemplate, static_file, url, redirect
+
 
 ROOT_DIR = '../httpdocs/communitysupportedagriculture.ie/Development20180422_frameworks'
 TPL_DIR = ROOT_DIR + '/templates'
 IMAGES_DIR = ROOT_DIR + '/images'
 STATIC_DIR = ROOT_DIR + '/static'
-
+TMP_DIR = ROOT_DIR + '/tmp'
 
 # @route('/hi/<name>')
 # def hi(name):
@@ -156,7 +157,7 @@ def render_login():
     Avoids another request to server, which allows flash message to be displayed.
     """
     try:
-        flash_message("deco flash2")
+        #flash_message("deco flash2")
         tpl_name = 'login.tpl'
         cwd = os.getcwd()
         os.chdir(TPL_DIR)
@@ -184,7 +185,7 @@ def authenticate(username, password):
     if username and password:
         if username == 'deco' and password == 'password':
             return 'admin'
-    flash_message("Incorrect username or password")
+    # flash_message("Incorrect username or password")
     return None
 #
 
@@ -198,13 +199,15 @@ def login_post():
         bottle.response.set_cookie('farmname', 'cloughjordan')  # todo temp
         bottle.response.set_cookie('username', username)
         bottle.response.set_cookie('role', role)
+        # flash_message("login admin")
         redirect('/Development20180422_frameworks/editfarm')
     elif role == 'editor':
         bottle.response.set_cookie('farmname', 'cloughjordan')
         bottle.response.set_cookie('username', username)
         bottle.response.set_cookie('role', role)
+        # flash_message("login editor")
         redirect('/Development20180422_frameworks/editfarm')
-    flash_message("deco flash")
+    # flash_message("login fail")
     return render_login()
 #
 
@@ -214,7 +217,7 @@ def logout():
     bottle.response.delete_cookie('username')
     bottle.response.delete_cookie('role')
     import sys
-    flash_message(sys.version)
+    # flash_message(sys.version)
     return render_login()
     # redirect('/Development20180422_frameworks/login')
     # return "hello"
