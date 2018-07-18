@@ -51,6 +51,108 @@ LINKS = OrderedDict([
     ])
 #
 
+
+def debug_msg(msg):  # TODO: delete
+    cwd = os.getcwd()
+    try:
+        os.chdir(TMP_DIR)
+        fd = open("debug.txt", "a")
+        fd.write(msg)
+        fd.write("\n")
+        fd.close()
+    finally:
+        os.chdir(cwd)
+#
+
+
+REQ_FLASH_MSGS_READ = False
+
+def get_flash_messages():
+    global REQ_FLASH_MSGS_READ
+    msgs = []
+    if not REQ_FLASH_MSGS_READ:
+        msgs_req = bottle.request.get_cookie('flash', default='').split('$')
+        msgs.extend(msgs_req)
+        REQ_FLASH_MSGS_READ = True
+    if bottle.response._cookies:
+        cookie = bottle.response._cookies.get('flash', None)
+        if cookie:
+            msgs_current = cookie.value.split('$')
+            if msgs_current:
+                msgs.extend(msgs_current)
+        #msgs.extend(bottle.response._cookies.get('flash', '').split('$'))
+    bottle.response.delete_cookie('flash')
+    return msgs
+#
+
+def flash_message(msg):
+    # debug_msg("flashing msg %s\nexisting req cokie %s\nexisting resp cookie %s\n" % (msg, str(bottle.request.get_cookie('flash', default='')), str(bottle.response._cookies.get('flash', '')) if bottle.response._cookies else "no resp cokies"))
+    debug_msg("flashing msg '%s'" % (msg))
+    
+    global REQ_FLASH_MSGS_READ
+    msgs = []
+    #if True:
+    if not REQ_FLASH_MSGS_READ:
+        cookies = bottle.request.cookies
+        debug_msg("bottle.request.cookies: %s" % str(cookies.__dict__))
+        request_msg = bottle.request.get_cookie("flash")
+        if request_msg:
+            debug_msg("request flash msg '%s'" % request_msg)
+            msg = request_msg + '$' + msg
+        # msgs_req = bottle.request.get_cookie('flash', default='').split('$')
+        # msgs.extend(msgs_req)
+        REQ_FLASH_MSGS_READ = True
+    
+    written = False
+    if bottle.response._cookies:
+        debug_msg("bottle.response._cookies: %s" % str(bottle.response._cookies))
+        morsel = bottle.response._cookies.get('flash', None)
+        if morsel:
+            current_msgs = morsel.value
+            debug_msg("current response flash msg '%s'" % current_msgs)
+            # debug_msg("morsel %s" % morsel.__dict__)
+            # debug_msg("morsel value %s" % morsel.value)
+            # debug_msg("morsel msgs %s" % str(current_msgs))
+            msg = current_msgs + '$' + msg
+            # morsel.value += ("$" + msg)
+            # bottle.response._cookies['flash'] = morsel.value
+            bottle.response._cookies['flash'] = msg
+            debug_msg("updated response flash msg '%s'" % msg)
+            written = True
+    if not written:
+        bottle.response.set_cookie('flash', msg)
+        morsel = bottle.response._cookies.get('flash', None)
+        if morsel:
+            debug_msg("new response flash cookie '%s'" % morsel.__dict__)
+
+
+    debug_msg("\n\n")
+
+def render_template(name, **kwargs):
+    """
+    Render template with flash messages.
+    """
+    cwd = os.getcwd()
+    try:
+        os.chdir(TPL_DIR)
+        tpl_name = name + '.tpl'
+        if not os.path.isfile(tpl_name):
+            return "Error"  # TODO
+        tpl = SimpleTemplate(source=open(tpl_name).read())
+        
+        # s = bottle.request.environ.get('beaker.session')
+        # s['test'] = s.get('test', 0) + 1
+        # s.save()
+        # counter = s['test']
+        
+        
+        # kwargs.update({'page_name': name, 'links': LINKS, 'flash_messages': get_flash_messages()})
+        kwargs.update({'page_name': name, 'links': LINKS, 'flash_messages': []})
+        return tpl.render(**kwargs)
+    finally:
+        os.chdir(cwd)
+
+
 @route('/')
 @route('/home')
 def home():
@@ -150,30 +252,33 @@ def farmprofiles_beta_get():
         os.chdir(cwd)
 #
 
-def render_login():
-    """
-    Render login page, useful when login fails, etc.
+# def render_login():
+    # """
+    # Render login page, useful when login fails, etc.
     
-    Avoids another request to server, which allows flash message to be displayed.
-    """
-    try:
-        #flash_message("deco flash2")
-        tpl_name = 'login.tpl'
-        cwd = os.getcwd()
-        os.chdir(TPL_DIR)
+    # Avoids another request to server, which allows flash message to be displayed.
+    # """
+    # try:
+        # #flash_message("deco flash2")
+        # tpl_name = 'login.tpl'
+        # cwd = os.getcwd()
+        # os.chdir(TPL_DIR)
         
-        if not os.path.isfile(tpl_name):
-            return "Error"
-        tpl = SimpleTemplate(source=open(tpl_name).read())
-        return tpl.render(page_name='login', links=LINKS)
-    except Exception as exc:
-        return str(exc)
-    finally:
-        os.chdir(cwd)
+        # if not os.path.isfile(tpl_name):
+            # return "Error"
+        # tpl = SimpleTemplate(source=open(tpl_name).read())
+        # return tpl.render(page_name='login', links=LINKS)
+    # except Exception as exc:
+        # return str(exc)
+    # finally:
+        # os.chdir(cwd)
 
 @get('/login')
 def login_get():
-    return render_login()
+    flash_message("login get")
+    flash_message("login get2")
+    return render_template('login')
+    # return render_login()
 #
 
 def authenticate(username, password):
@@ -191,6 +296,7 @@ def authenticate(username, password):
 
 @post('/login')
 def login_post():
+    flash_message("login post")
     form = cgi.FieldStorage()
     username = cgi.escape(form.getfirst('username', ''))
     password = cgi.escape(form.getfirst('password', ''))
@@ -199,16 +305,17 @@ def login_post():
         bottle.response.set_cookie('farmname', 'cloughjordan')  # todo temp
         bottle.response.set_cookie('username', username)
         bottle.response.set_cookie('role', role)
-        # flash_message("login admin")
+        flash_message("login post admin")
         redirect('/Development20180422_frameworks/editfarm')
     elif role == 'editor':
         bottle.response.set_cookie('farmname', 'cloughjordan')
         bottle.response.set_cookie('username', username)
         bottle.response.set_cookie('role', role)
-        # flash_message("login editor")
+        flash_message("login post editor")
         redirect('/Development20180422_frameworks/editfarm')
-    # flash_message("login fail")
-    return render_login()
+    flash_message("login post fail")
+    # return render_login()
+    return render_template("login")
 #
 
 
