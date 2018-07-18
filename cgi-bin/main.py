@@ -19,6 +19,8 @@ TPL_DIR = ROOT_DIR + '/templates'
 IMAGES_DIR = ROOT_DIR + '/images'
 STATIC_DIR = ROOT_DIR + '/static'
 TMP_DIR = ROOT_DIR + '/tmp'
+DATA_DIR = ROOT_DIR + '/data'
+
 
 # @route('/hi/<name>')
 # def hi(name):
@@ -99,8 +101,6 @@ def flash_message(msg):
         if request_msg:
             debug_msg("request flash msg '%s'" % request_msg)
             msg = request_msg + '$' + msg
-        # msgs_req = bottle.request.get_cookie('flash', default='').split('$')
-        # msgs.extend(msgs_req)
         REQ_FLASH_MSGS_READ = True
     
     written = False
@@ -132,6 +132,9 @@ def render_template(name, **kwargs):
     """
     Render template with flash messages.
     """
+    # if name == 'editfarm':
+        # return "asdfasdf3"
+        
     cwd = os.getcwd()
     try:
         os.chdir(TPL_DIR)
@@ -148,7 +151,11 @@ def render_template(name, **kwargs):
         
         # kwargs.update({'page_name': name, 'links': LINKS, 'flash_messages': get_flash_messages()})
         kwargs.update({'page_name': name, 'links': LINKS, 'flash_messages': []})
+        # if name == 'editfarm':
+            # return "adsfadsf"
         return tpl.render(**kwargs)
+    except Exception as exc:
+        return str(exc)
     finally:
         os.chdir(cwd)
 
@@ -362,47 +369,61 @@ def get_new_farm_content():
 
 #
 
+#@login_required
 @route('/editfarm')
-@login_required
 def editfarm():
-    try:
-        cwd = os.getcwd()
-        os.chdir(TPL_DIR)
-        data_dir = os.path.join(os.pardir, 'data')
+    #farmname = request.get_cookie('farmname')
+    farmname = 'cloughjordan'
+    json_file = os.path.join(DATA_DIR, '%s.json' % farmname)
+    if os.path.isfile(json_file):
+        content = json.load(open(json_file, 'rb'))
+    else:
+        content = get_new_farm_content()
+    instructions = json.load(open(os.path.join(DATA_DIR, 'instructions.json'), 'rb'))
+    # render_template(name, **kwargs)
+    
+    flash_message("editfarm")
+    
+    return render_template('editfarm', content=content, instructions=instructions)
+    
+    # try:
+        # cwd = os.getcwd()
+        # os.chdir(TPL_DIR)
+        # data_dir = os.path.join(os.pardir, 'data')
         
-        farmname = request.get_cookie('farmname')
-        json_file = os.path.join(data_dir, '%s.json' % farmname)
-        if os.path.isfile(json_file):
-            content = json.load(open(json_file, 'rb'))
-        else:
-            content = get_new_farm_content()
+        # farmname = request.get_cookie('farmname')
+        # json_file = os.path.join(data_dir, '%s.json' % farmname)
+        # if os.path.isfile(json_file):
+            # content = json.load(open(json_file, 'rb'))
+        # else:
+            # content = get_new_farm_content()
         
-        instructions = json.load(open(os.path.join(data_dir, 'instructions.json'), 'rb'))
+        # instructions = json.load(open(os.path.join(data_dir, 'instructions.json'), 'rb'))
         
-        # return str(instructions)
+        # # return str(instructions)
         
-        # instructions = {}
-        # f0 = os.path.join(DATA_DIR, 'cloughjordan.json')
-        # instructions[f0] = os.path.isfile(f0)
+        # # instructions = {}
+        # # f0 = os.path.join(DATA_DIR, 'cloughjordan.json')
+        # # instructions[f0] = os.path.isfile(f0)
         
-        # f0 = os.path.join(os.pardir, 'data', 'cloughjordan.json')
-        # instructions[f0] = os.path.isfile(f0)
+        # # f0 = os.path.join(os.pardir, 'data', 'cloughjordan.json')
+        # # instructions[f0] = os.path.isfile(f0)
         
-        # f0 = os.path.join(os.pardir, 'data')
-        # instructions[f0] = os.path.isdir(f0)
+        # # f0 = os.path.join(os.pardir, 'data')
+        # # instructions[f0] = os.path.isdir(f0)
         
-        # f0 = DATA_DIR
-        # instructions[f0] = os.path.isdir(f0)
+        # # f0 = DATA_DIR
+        # # instructions[f0] = os.path.isdir(f0)
         
         
         
-        tpl = SimpleTemplate(source=open('editfarm.tpl').read())
-        return tpl.render(page_name='editfarm', links=LINKS, content=content, instructions=instructions)
+        # tpl = SimpleTemplate(source=open('editfarm.tpl').read())
+        # return tpl.render(page_name='editfarm', links=LINKS, content=content, instructions=instructions)
         
-    except Exception as exc:
-        return str(exc)
-    finally:
-        os.chdir(cwd)
+    # except Exception as exc:
+        # return str(exc)
+    # finally:
+        # os.chdir(cwd)
     
 #
 
