@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import cgi
+import datetime
 from collections import OrderedDict
 import json
 import os
@@ -14,7 +15,7 @@ import bottle
 from bottle import route, get, post, run, request, response, template, SimpleTemplate, static_file, url, redirect
 
 
-ROOT_DIR = '../httpdocs/communitysupportedagriculture.ie/Development20180422_frameworks'
+ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie/Development20180422_frameworks')
 TPL_DIR = ROOT_DIR + '/templates'
 IMAGES_DIR = ROOT_DIR + '/images'
 STATIC_DIR = ROOT_DIR + '/static'
@@ -69,72 +70,61 @@ def debug_msg(msg):  # TODO: delete
 
 REQ_FLASH_MSGS_READ = False
 
-def get_flash_messages():
-    global REQ_FLASH_MSGS_READ
-    msgs = []
-    if not REQ_FLASH_MSGS_READ:
-        msgs_req = bottle.request.get_cookie('flash', default='').split('$')
-        msgs.extend(msgs_req)
-        REQ_FLASH_MSGS_READ = True
-    if bottle.response._cookies:
-        cookie = bottle.response._cookies.get('flash', None)
-        if cookie:
-            msgs_current = cookie.value.split('$')
-            if msgs_current:
-                msgs.extend(msgs_current)
-        #msgs.extend(bottle.response._cookies.get('flash', '').split('$'))
-    bottle.response.delete_cookie('flash')
-    return msgs
-#
 
-def flash_message(msg):
-    # debug_msg("flashing msg %s\nexisting req cokie %s\nexisting resp cookie %s\n" % (msg, str(bottle.request.get_cookie('flash', default='')), str(bottle.response._cookies.get('flash', '')) if bottle.response._cookies else "no resp cokies"))
-    debug_msg("flashing msg '%s'" % (msg))
-    
+def get_flash_messages():
+    """
+    Read the flash messages currently stored in the 'flash' cookie. These may be in the request object,
+    if e.g. there was a redirect, otherwise messages from this request will be in the response object.
+    """
     global REQ_FLASH_MSGS_READ
-    msgs = []
-    #if True:
+    msg = ""
     if not REQ_FLASH_MSGS_READ:
+        # We haven't read the 'flash' messages from the request, i.e. in flash_message, so we will not have
+        # written these into the response
         cookies = bottle.request.cookies
-        debug_msg("bottle.request.cookies: %s" % str(cookies.__dict__))
         request_msg = bottle.request.get_cookie("flash")
         if request_msg:
-            debug_msg("request flash msg '%s'" % request_msg)
+            msg = request_msg
+        REQ_FLASH_MSGS_READ = True
+    else:
+        if bottle.response._cookies:
+            morsel = bottle.response._cookies.get('flash', None)
+            if morsel:
+                current_msg = morsel.value
+                msg = current_msg
+    # It seems that if a cookie is not set in the response, the value from the request is taken. So
+    # if the current flash message is taken from the request or the response, wiping it in the response
+    # will be sufficient.
+    bottle.response.set_cookie('flash', "")
+    return msg.split('$')
+
+
+def flash_message(msg):
+    global REQ_FLASH_MSGS_READ
+    msgs = []
+    if not REQ_FLASH_MSGS_READ:
+        cookies = bottle.request.cookies
+        request_msg = bottle.request.get_cookie("flash")
+        if request_msg:
             msg = request_msg + '$' + msg
         REQ_FLASH_MSGS_READ = True
     
     written = False
     if bottle.response._cookies:
-        debug_msg("bottle.response._cookies: %s" % str(bottle.response._cookies))
         morsel = bottle.response._cookies.get('flash', None)
         if morsel:
-            current_msgs = morsel.value
-            debug_msg("current response flash msg '%s'" % current_msgs)
-            # debug_msg("morsel %s" % morsel.__dict__)
-            # debug_msg("morsel value %s" % morsel.value)
-            # debug_msg("morsel msgs %s" % str(current_msgs))
-            msg = current_msgs + '$' + msg
-            # morsel.value += ("$" + msg)
-            # bottle.response._cookies['flash'] = morsel.value
+            current_msg = morsel.value
+            msg = current_msg + '$' + msg
             bottle.response._cookies['flash'] = msg
-            debug_msg("updated response flash msg '%s'" % msg)
             written = True
     if not written:
         bottle.response.set_cookie('flash', msg)
-        morsel = bottle.response._cookies.get('flash', None)
-        if morsel:
-            debug_msg("new response flash cookie '%s'" % morsel.__dict__)
 
-
-    debug_msg("\n\n")
 
 def render_template(name, **kwargs):
     """
     Render template with flash messages.
     """
-    # if name == 'editfarm':
-        # return "asdfasdf3"
-        
     cwd = os.getcwd()
     try:
         os.chdir(TPL_DIR)
@@ -142,20 +132,8 @@ def render_template(name, **kwargs):
         if not os.path.isfile(tpl_name):
             return "Error"  # TODO
         tpl = SimpleTemplate(source=open(tpl_name).read())
-        
-        # s = bottle.request.environ.get('beaker.session')
-        # s['test'] = s.get('test', 0) + 1
-        # s.save()
-        # counter = s['test']
-        
-        
-        # kwargs.update({'page_name': name, 'links': LINKS, 'flash_messages': get_flash_messages()})
-        kwargs.update({'page_name': name, 'links': LINKS, 'flash_messages': []})
-        # if name == 'editfarm':
-            # return "adsfadsf"
+        kwargs.update({'page_name': name, 'links': LINKS, 'messages_to_flash': get_flash_messages()})  # Retrieve and wipe flash messages
         return tpl.render(**kwargs)
-    except Exception as exc:
-        return str(exc)
     finally:
         os.chdir(cwd)
 
@@ -259,33 +237,25 @@ def farmprofiles_beta_get():
         os.chdir(cwd)
 #
 
-# def render_login():
-    # """
-    # Render login page, useful when login fails, etc.
-    
-    # Avoids another request to server, which allows flash message to be displayed.
-    # """
-    # try:
-        # #flash_message("deco flash2")
-        # tpl_name = 'login.tpl'
-        # cwd = os.getcwd()
-        # os.chdir(TPL_DIR)
-        
-        # if not os.path.isfile(tpl_name):
-            # return "Error"
-        # tpl = SimpleTemplate(source=open(tpl_name).read())
-        # return tpl.render(page_name='login', links=LINKS)
-    # except Exception as exc:
-        # return str(exc)
-    # finally:
-        # os.chdir(cwd)
-
 @get('/login')
 def login_get():
-    flash_message("login get")
-    flash_message("login get2")
+    #flash_message("I'm going to login")
     return render_template('login')
-    # return render_login()
+#
+
+# TODO: NB save passwords as hash+salt in a db instead of as raw text
+PERMISSIONS = {
+    'declan': {'role': 'admin', 'password': 'declan', 'farms': 'cloughjordan'},
+    # 'roisin': {'role': 'admin', 'password': 'roisin', 'farms': 'cloughjordan;dublin'},
+    #'seamus': {'role': 'editor', 'password': 'seamus', 'farms': 'dublin'},
+    'paddy': {'role': 'editor', 'password': 'paddy', 'farms': 'cloughjordan'},
+}
+
+
+def clear_session():
+    bottle.response.delete_cookie('farmname')
+    bottle.response.delete_cookie('username')
+    bottle.response.delete_cookie('role')
 #
 
 def authenticate(username, password):
@@ -294,51 +264,44 @@ def authenticate(username, password):
     Returns:
         (str) Type of user.
     """
+    global PERMISSIONS
     if username and password:
-        if username == 'deco' and password == 'password':
-            return 'admin'
-    # flash_message("Incorrect username or password")
+        if username in PERMISSIONS:
+            if 'password' in PERMISSIONS[username] and password == PERMISSIONS[username]['password'] and 'role' in PERMISSIONS[username]:
+                role = PERMISSIONS[username]['role']
+                bottle.response.set_cookie('farmname', 'cloughjordan')  # todo temp
+                bottle.response.set_cookie('username', username)
+                bottle.response.set_cookie('role', role)
+                return role
+    clear_session()
     return None
 #
 
 @post('/login')
 def login_post():
-    flash_message("login post")
+    #flash_message("login post")
     form = cgi.FieldStorage()
     username = cgi.escape(form.getfirst('username', ''))
     password = cgi.escape(form.getfirst('password', ''))
     role = authenticate(username, password)
-    if role == 'admin':  # todo
-        bottle.response.set_cookie('farmname', 'cloughjordan')  # todo temp
-        bottle.response.set_cookie('username', username)
-        bottle.response.set_cookie('role', role)
-        flash_message("login post admin")
-        redirect('/Development20180422_frameworks/editfarm')
-    elif role == 'editor':
-        bottle.response.set_cookie('farmname', 'cloughjordan')
-        bottle.response.set_cookie('username', username)
-        bottle.response.set_cookie('role', role)
-        flash_message("login post editor")
-        redirect('/Development20180422_frameworks/editfarm')
-    flash_message("login post fail")
-    # return render_login()
+    if role != None:
+        auth_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
+        flash_message("Authenticated user <b>%s</b> at %s" % (username, auth_time))
+        if role == 'admin':
+            redirect('/Development20180422_frameworks/editfarm')  # TODO: should have admin landing page - create and delete farms
+        else:
+            redirect('/Development20180422_frameworks/editfarm')
+    flash_message("Authentication for user '%s' failed. Please contact admin to reset." % username)
     return render_template("login")
 #
 
 
 @route('/logout')
 def logout():
-    bottle.response.delete_cookie('username')
-    bottle.response.delete_cookie('role')
-    import sys
-    # flash_message(sys.version)
-    return render_login()
-    # redirect('/Development20180422_frameworks/login')
-    # return "hello"
+    clear_session()
+    flash_message("Signed out")
+    redirect('/Development20180422_frameworks/login')
 #
-
-
-
 
 # Ref: http://flask.pocoo.org/docs/0.12/patterns/viewdecorators/
 from functools import wraps
@@ -347,18 +310,19 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         username = request.get_cookie('username', None)
-        if not username:
-            return render_login()
+        role = request.get_cookie('role', None)
+        debug_msg("login_required username:%s role:%s" % (username, role))
+        if username is None or role not in ['admin', 'editor']:
+            return render_template("login")
         return f(*args, **kwargs)
     return decorated_function
 #
 
-
 def get_new_farm_content():
     return OrderedDict([
         ("title", ""),
-        ("image", ""),
-        ("desc", []),
+        ("images", []),
+        ("description", []),
         ("info", OrderedDict([
             ("Website", ""),
             ("Email", ""),
@@ -366,70 +330,28 @@ def get_new_farm_content():
             ("Farmers", [])
         ])),
     ])
-
 #
 
-#@login_required
 @route('/editfarm')
+@login_required
 def editfarm():
-    #farmname = request.get_cookie('farmname')
-    farmname = 'cloughjordan'
+    debug_msg("editfarm")
+    debug_msg("bottle.request.cookies: %s" % str(bottle.request.cookies.__dict__))
+    debug_msg("bottle.response._cookies: %s" % str(bottle.response._cookies))
+    debug_msg("\n\n")
+
+    farmname = request.get_cookie('farmname')
+    username = request.get_cookie('username')
+    role = request.get_cookie('role')
+    # farmname = 'cloughjordan'
     json_file = os.path.join(DATA_DIR, '%s.json' % farmname)
     if os.path.isfile(json_file):
         content = json.load(open(json_file, 'rb'))
     else:
         content = get_new_farm_content()
     instructions = json.load(open(os.path.join(DATA_DIR, 'instructions.json'), 'rb'))
-    # render_template(name, **kwargs)
-    
-    flash_message("editfarm")
-    
-    return render_template('editfarm', content=content, instructions=instructions)
-    
-    # try:
-        # cwd = os.getcwd()
-        # os.chdir(TPL_DIR)
-        # data_dir = os.path.join(os.pardir, 'data')
-        
-        # farmname = request.get_cookie('farmname')
-        # json_file = os.path.join(data_dir, '%s.json' % farmname)
-        # if os.path.isfile(json_file):
-            # content = json.load(open(json_file, 'rb'))
-        # else:
-            # content = get_new_farm_content()
-        
-        # instructions = json.load(open(os.path.join(data_dir, 'instructions.json'), 'rb'))
-        
-        # # return str(instructions)
-        
-        # # instructions = {}
-        # # f0 = os.path.join(DATA_DIR, 'cloughjordan.json')
-        # # instructions[f0] = os.path.isfile(f0)
-        
-        # # f0 = os.path.join(os.pardir, 'data', 'cloughjordan.json')
-        # # instructions[f0] = os.path.isfile(f0)
-        
-        # # f0 = os.path.join(os.pardir, 'data')
-        # # instructions[f0] = os.path.isdir(f0)
-        
-        # # f0 = DATA_DIR
-        # # instructions[f0] = os.path.isdir(f0)
-        
-        
-        
-        # tpl = SimpleTemplate(source=open('editfarm.tpl').read())
-        # return tpl.render(page_name='editfarm', links=LINKS, content=content, instructions=instructions)
-        
-    # except Exception as exc:
-        # return str(exc)
-    # finally:
-        # os.chdir(cwd)
-    
+    return render_template('editfarm', farmname=farmname, username=username, role=role, content=content, instructions=instructions)
 #
-
-
-
-
 
 @route('/admin')
 @login_required

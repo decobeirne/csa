@@ -28,8 +28,8 @@
                 % end
             </div>
             <div class="body-container">
-                % for msg in flash_messages:
-                    <p class="flash">{{msg}}</p>
+                % for message in messages_to_flash:
+                    <p class="flash">{{!message}}</p>
                 % end
                 {{!base}}
             </div>
