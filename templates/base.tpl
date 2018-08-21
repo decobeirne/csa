@@ -28,9 +28,24 @@
                 % end
             </div>
             <div class="body-container">
-                % for message in messages_to_flash:
-                    <p class="flash">{{!message}}</p>
+                <div class="flash">
+                    % for message in messages_to_flash:
+                        <p class="flash">{{!message}}</p>
+                    % end
+                </div>
+                
+                % if username:
+                    <div class="admin-info-container">
+                        <p>Signed in as user <b>{{username}}</b>, with role <b>{{role}}</b></p>
+                        % if role == 'admin':
+                            <p><a href="admin">admin page</a></p>
+                        % elif role == 'editor' and farmname:
+                            <p><a href="editfarm">edit {{farmname}} profile</a></p>
+                        % end
+                        <p><a href="logout">logout</a></p>
+                    </div>
                 % end
+                
                 {{!base}}
             </div>
             <div id="banner-container-bottom">

@@ -87,6 +87,10 @@
     cursor: pointer;
 }
 
+.admin-info-container {
+    border-bottom: 1px solid #92E027;
+}
+
 
 /*
  *
@@ -120,8 +124,10 @@ p.footnote {
 }
 
 .body-container h3 {
-    padding-left: 80px;  /* More readable when these are a little to the left. */
-    padding-right: 80px;
+    /*padding-left: 80px;*/  /* More readable when these are a little to the left. */
+    /*padding-right: 80px;*/
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .no-indent-container p {
@@ -161,6 +167,19 @@ p.footnote {
     /* new */
     padding-left: 0px;  /* Override */
     padding-right: 0px;  /* Override */
+}
+
+.flash p {
+    padding-bottom: 0px;
+    background-color: #cae7de;
+}
+
+.admin-info-container p {
+    padding-bottom: 0px;
+}
+
+.admin-container p {
+    padding-bottom: 0px;
 }
 
 li {

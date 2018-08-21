@@ -7,11 +7,6 @@ var setup = function() {
 window.onload = setup;
 </script>
 
-<p>Signed in as user <b>{{username}}</b>, with role <b>{{role}}</b>, editing farm profile <b>{{farmname}}</b></p>
-<p>
-<a href="logout">logout</a>
-</p>
-
 <form method="post" action="farmprofiles-beta">
     % keys = instructions['order']
     % textarea_inputs = instructions['textarea-inputs']
@@ -99,8 +94,3 @@ window.onload = setup;
         <input type="submit" value="Update farm">
     </div>
 </form>
-
-
-<p>
-<a href="logout">logout</a>
-</p>
