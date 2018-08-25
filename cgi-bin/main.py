@@ -286,7 +286,7 @@ def get_new_farm_content():
     ])
 #
 
-@route('/editfarm')
+@get('/editfarm')
 @farm_login_required
 def editfarm():
     farmname = request.get_cookie('farmname')
@@ -299,6 +299,31 @@ def editfarm():
         content = get_new_farm_content()
     instructions = json.load(open(os.path.join(DATA_DIR, 'instructions.json'), 'rb'))
     return render_template('editfarm', farmname=farmname, username=username, role=role, content=content, instructions=instructions)
+#
+
+@post()
+@farm_login_required
+def editfarm_post():
+    form = cgi.FieldStorage()
+    if form.getvalue('SubmitUpdate'):
+        pass
+    else:
+        # Assume cancel was hit
+        pass
+    username = cgi.escape(form.getfirst('username', ''))
+    password = cgi.escape(form.getfirst('password', ''))
+    bottle.response.set_cookie('foo2', 'bar2', path='/')
+    role = authenticate(username, password)
+    bottle.response.set_cookie('foo3', 'bar3', path='/')
+    if role in ['admin', 'editor']:
+        auth_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
+        flash_message("Authenticated user <b>%s</b> on %s" % (username, auth_time))
+        if role == 'admin':
+            redirect('/Development20180422_frameworks/admin')
+        else:
+            redirect('/Development20180422_frameworks/editfarm')
+    flash_message("Authentication for user <b>%s</b> failed. Please contact admin to reset your password if required." % username)
+    return render_template("login")
 #
 
 @route('/admin')
