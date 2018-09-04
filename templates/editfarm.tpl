@@ -7,9 +7,15 @@ var setup = function() {
 window.onload = setup;
 </script>
 
-<form method="post" action="farmprofiles-beta">
-    % keys = instructions['order']
-    % textarea_inputs = instructions['textarea-inputs']
+<form method="post" action="editfarm">
+    <!-- Including the farmname as a hidden input allows for error checking in the post function -->
+    <input type="hidden" name="farmname" value="{{farmname}}">
+
+    % keys = data_layout['order']
+    % textarea_inputs = data_layout['textarea-inputs']
+    % single_value_inputs = data_layout['single-value-inputs']
+    % nested_inputs = data_layout['nested-inputs']
+    % required_nested_inputs = data_layout['required-nested-inputs']
 
     <!-- Iterate through keys as listed in instruction dict -->
     % for key in keys:
@@ -21,109 +27,84 @@ window.onload = setup;
             % title = key.capitalize()
             <p class="edit-farm-key">{{title}}</p>
             <p class="edit-farm-instruction">{{instruction}}</p>
+
+            % if key in nested_inputs:
+            <!-- Key "{{key}}" contains nested values, e.g. key is "info" in "info": {"Website": ["cloughjordancommunityfarm.ie"]} -->
+
+
+                % subkeys = sorted(value.keys())
+                % for subkey in subkeys:
+                <!-- Subkey "{{subkey}}" under key "{{key}}", e.g. "Website" in "info": {"Website": ["cloughjordancommunityfarm.ie"]} -->
+
+                    % subvalue = value[subkey]
+                    <p class="edit-farm-sub-key">{{subkey}}</p>
+
+                    % if subkey not in required_nested_inputs:
+                    <!-- Controls to delete the key-value pair -->
+                    
+                    <!-- End of controls -->
+                    %end
+
+                    % for subitem in subvalue:
+
+                        <div class="input-container">
+                            <!-- E.g. info$0$Address$1 if we have {"info'": ["Address", ["Foo", "Bar"]]} -->
+                            <input type="text" name="{{key}}${{subkey}}" value="{{subitem}}">
+                        </div>
+                        
+                        % if subkey not in required_nested_inputs:
+                        <!-- Controls to delete this value under the subkey -->
+                        
+                        <!-- End of controls -->
+                        %end
+
+                    % end
+
+                    % if subkey not in required_nested_inputs:
+                    <!-- Controls to add new entry under subkey "{{subkey}}" -->
+                    
+                    <!-- End of controls -->
+                    %end
+
+                <!-- End of subkey "{{subkey}}" -->
+                % end
+                
+                <!-- Controls to add new a key-value pair -->
+                
+                <!-- End of controls -->
             
-            % if type(value) != list:
-            <!-- There is just a single string for this key, e.g. "title" -->
-
-                <div class="input-container">
-                    <input type="text" name="{{key}}" value="{{value}}">
-                </div>
-
-            <!-- End value != list for "{{key}}" -->
+            <!-- End of key "{{key}}" with nested values -->
             % else:
-            <!-- The value for "{{key}}" is a list -->
+            <!-- Key "{{key}}" doesn't contain nested values, i.e. just a list of strings, e.g. "description": ["Foo", "Bar"] -->
 
-                % if len(value) == 0:
-                <!-- If there is nothing in the list currently, then assume it should contain strings, e.g. "desc" -->
-                <!-- We're give this key one empty input. Others may be added by the user, so name this one key£0 -->
-                <!-- Use "£" as a separator to (hopefully) avoid needing to escape strings -->
+
+                % for item in value:
 
                     <div class="input-container">
                         % if key in textarea_inputs:
-                            <textarea rows="8" name="{{key}}£0"></textarea>
+                            <textarea rows="8" name= "{{key}}">{{item}}</textarea>
                         % else:
-                            <input type="text" name="{{key}}£0">
+                            <input type="text" name="{{key}}" value="{{item}}">
                         % end
+                        
+                        % if key not in single_value_inputs:
+                        <!-- Controls to remove this input -->
+                        
+                        <!-- End of controls to remove this input -->
+                        %end
+
                     </div>
 
-                <!-- End of empty list for key "{{key}}" -->
-                % else:
-                <!-- Iterate through items in list for key "{{key}}" -->
-
-                    % count = 0
-                    % for item in value:
-                    <!-- Item {{count}} in list for "{{key}}" -->
-
-                        %if type(item) != list:
-                        <!-- If the item is not a list, then assume it is a string, e.g. a paragraph in "desc" -->
-
-                            <div class="input-container">
-                                % if key in textarea_inputs:
-                                    <textarea rows="8" name= "{{key}}£{{count}}">{{item}}</textarea>
-                                % else:
-                                    <input type="text" name="{{key}}£{{count}}" value="{{item}}">
-                                % end
-                            </div>
-
-                        <!-- End of single item in list for "{{key}}" -->
-                        % else:
-                        <!-- The item within the list for "{{key}}" is a list, e.g. under "info", the first item might be ["Website", "cloughjordancommunityfarm.ie"] -->
-
-                            % subkey = item[0]
-                            % subvalue = item[1]
-                            <p class="edit-farm-sub-key">{{subkey}}</p>
-
-                            % if type(subvalue) != list:
-                            <!-- The subkey "{{subkey}}" of "{{key}}" is a single item -->
-
-                                <div class="input-container">
-                                    <input type="text" name="{{key}}£{{count}}£{{subkey}}">
-                                </div>
-
-                            <!-- End of single item for subkey "{{subkey}}" under "{{key}}" -->
-                            % else:
-                            <!-- The key "{{key}}" contains a list, and this item of the list, "{{subkey}}", is also a list -->
-                            <!-- E.g. the key "info" contains a list, and under the subkey "Farmers" we also have a list, e.g. ["FarmerA", "FarmerB"] -->
-
-                                % if len(subvalue) == 0:
-                                <!-- The list for "{{subkey}}" under "{{key}}" is empty, so add one input -->
-
-                                    <div class="input-container">
-                                        <input type="text" name="{{key}}£{{count}}£{{subkey}}£0}}">
-                                    </div>
-
-                                <!-- End of empty list for "{{subkey}}" under "{{key}}" -->
-                                % else:
-                                <!-- The list for "{{subkey}}" under "{key}}" contains values -->
-
-                                    % subcount = 0
-                                    % for subitem in subvalue:
-
-                                        <div class="input-container">
-                                            <!-- E.g. info$0$Address$1 if we have {"info'": ["Address", ["Foo", "Bar"]]} -->
-                                            <input type="text" name="{{key}}£{{count}}£{{subkey}}£{{subcount}}" value="{{subitem}}">
-                                        </div>
-
-                                        % subcount += 1
-                                    % end
-
-                                <!-- End of going through items in list for "{{subkey}}" under "{{key}}" -->
-                                % end
-
-                            <!-- End of looking at the list "{{subkey}}" under "{{key}}" -->
-                            % end
-
-                        <!-- End of looking at item under "{{key}}", where that item is also a list -->
-                        % end
-
-                        % count += 1
-                    <!-- End of item in list for "{{key}}" -->
-                    % end
-
-                <!-- End of len(value) != 0 -->
+                <!-- End of item in list for "{{key}}" -->
                 % end
+                
+                % if key not in single_value_inputs:
+                <!-- Controls to add a new string -->
+                
+                <!-- End of controls -->
+                %end
 
-            <!-- End looking at list value for "{{key}}" -->
+            <!-- End of key "{{key}}" that doesn't contain nested values -->
             % end
 
         </div>

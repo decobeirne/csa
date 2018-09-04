@@ -9,6 +9,10 @@ import os
 import bottle
 from bottle import route, get, post, run, request, response, template, SimpleTemplate, static_file, url, redirect
 
+#
+# Defines
+#
+
 ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie/Development20180422_frameworks')
 TPL_DIR = ROOT_DIR + '/templates'
 IMAGES_DIR = ROOT_DIR + '/images'
@@ -26,6 +30,10 @@ LINKS = OrderedDict([
     ('Contact', {'link': 'contact'}),
     ('Facebook', {'link': 'https://www.facebook.com/groups/245019725582313', 'tags': 'target="_blank"'}),
     ])
+#
+
+#
+# Utility functions
 #
 
 def debug_msg(msg):  # TODO: delete
@@ -61,6 +69,7 @@ def get_flash_messages():
             if morsel:
                 current_msg = morsel.value
                 msg = current_msg
+
     # It seems that if a cookie is not set in the response, the value from the request is taken. So
     # if the current flash message is taken from the request or the response, wiping it in the response
     # will be sufficient.
@@ -111,11 +120,14 @@ def render_template(name, **kwargs):
              'messages_to_flash': get_flash_messages(),  # Retrieve and wipe flash messages
              'username': username,
              'role': role,
-             'farmname': farmname})  
+             'farmname': farmname})
         return tpl.render(**kwargs)
     finally:
         os.chdir(cwd)
 
+#
+# Regular pages
+#
 
 @route('/')
 @route('/home')
@@ -133,42 +145,29 @@ def farmprofiles():
     return render_template('farmprofiles')
 #
 
-@post('/farmprofiles-beta')
-def farmprofiles_beta_post():
-    try:
-        cwd = os.getcwd()
-        import cgi
-        form = cgi.FieldStorage() # instantiate only once!
-        name = form.getfirst('name', 'no name')
-        # Avoid script injection escaping the user input
-        name = cgi.escape(name)
-        bottle.response.set_cookie('name', name)
-        return """\
-        Content-Type: text/html\n
-        <html><body>
-        <p>The submitted name was "%s"</p>
-        </body></html>
-        """ % name
-    except Exception as exc:
-        return str(exc)
-    finally:
-        os.chdir(cwd)
+@route('/contact')
+def contact():
+    return render_template('contact')
+#
+
+@route('/resources')
+def resources():
+    return render_template('resources')
 #
 
 @get('/farmprofiles-beta')
 def farmprofiles_beta_get():
-    try:
-        tpl_name = 'farmprofiles-beta.tpl'
-        cwd = os.getcwd()
-        os.chdir(TPL_DIR)
-        if not os.path.isfile(tpl_name):
-            return "Error"
-        tpl = SimpleTemplate(source=open(tpl_name).read())
-        return tpl.render(page_name='farmprofiles-beta', links=LINKS)
-    except Exception as exc:
-        return str(exc)
-    finally:
-        os.chdir(cwd)
+    farm_dict = json.load(open(os.path.join(DATA_DIR, 'farms.json'), 'rb'))
+    farms = farm_dict['farms']
+    farm_content_dict = {}
+    for farmname in farms:
+        farm_content = get_farm_content(farmname)
+        farm_content_dict[farmname] = farm_content
+    return render_template('farmprofiles-beta', farm_content_dict=farm_content_dict)
+#
+
+#
+# Admin pages
 #
 
 @get('/login')
@@ -286,44 +285,75 @@ def get_new_farm_content():
     ])
 #
 
+def get_farm_json_file(farmname):
+    return os.path.join(DATA_DIR, '%s.json' % farmname)
+#
+
+def get_farm_content(farmname):
+    json_file = get_farm_json_file(farmname)
+    if os.path.isfile(json_file):
+        content = json.load(open(json_file, 'rb'))
+    else:
+        content = get_new_farm_content()
+    return content
+#
+
+def update_farm_content(farmname, content):
+    json_file = get_farm_json_file(farmname)
+    debug_msg("update_farm_content json_file is '%s'" % json_file)
+    json.dump(content, open(json_file, 'wb'))
+#
+
 @get('/editfarm')
 @farm_login_required
 def editfarm():
     farmname = request.get_cookie('farmname')
     username = request.get_cookie('username')
     role = request.get_cookie('role')
-    json_file = os.path.join(DATA_DIR, '%s.json' % farmname)
-    if os.path.isfile(json_file):
-        content = json.load(open(json_file, 'rb'))
-    else:
-        content = get_new_farm_content()
-    instructions = json.load(open(os.path.join(DATA_DIR, 'instructions.json'), 'rb'))
-    return render_template('editfarm', farmname=farmname, username=username, role=role, content=content, instructions=instructions)
+    content = get_farm_content(farmname)
+    instructions = json.load(open(os.path.join(DATA_DIR, 'farm-data-instructions.json'), 'rb'))
+    data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
+    return render_template('editfarm', farmname=farmname, username=username, role=role, content=content, instructions=instructions, data_layout=data_layout)
 #
 
-@post()
+from HTMLParser import HTMLParser
+
+@post('/editfarm')
 @farm_login_required
 def editfarm_post():
+    # Retrieve data from form on the "editprofile" page.
     form = cgi.FieldStorage()
-    if form.getvalue('SubmitUpdate'):
-        pass
-    else:
-        # Assume cancel was hit
-        pass
-    username = cgi.escape(form.getfirst('username', ''))
-    password = cgi.escape(form.getfirst('password', ''))
-    bottle.response.set_cookie('foo2', 'bar2', path='/')
-    role = authenticate(username, password)
-    bottle.response.set_cookie('foo3', 'bar3', path='/')
-    if role in ['admin', 'editor']:
-        auth_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
-        flash_message("Authenticated user <b>%s</b> on %s" % (username, auth_time))
-        if role == 'admin':
-            redirect('/Development20180422_frameworks/admin')
+    farmname = cgi.escape(form.getfirst('farmname', ''))
+    form_keys = form.keys()
+
+    # The layout of the "editprofile" page is constructed according to farm-data-layout.json, so
+    # the logic here matches the "inputs" in that form.
+    layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
+    nested_inputs = layout['nested-inputs']
+
+    updated_content = {}
+    for key in sorted(form_keys):
+        values = form.getlist(key)
+
+        # Some entries in the farm data contain nested data. E.g. under "info", the editor of the farm profile is 
+        # allowed to add or remove key-value pairs, e.g. "Pick up location", which could be an address consisting
+        # of multiple strings.
+        key_tokens = key.split('$')
+        main_key = key_tokens[0]
+
+        if main_key in nested_inputs:
+            # For nested data, the "input" in the form is given the name "main-key$sub-key", e.g. "info$website"
+            sub_key = key_tokens[1]
+            if main_key not in updated_content:
+                updated_content[main_key] = {}
+            updated_content[main_key][sub_key] = values
         else:
-            redirect('/Development20180422_frameworks/editfarm')
-    flash_message("Authentication for user <b>%s</b> failed. Please contact admin to reset your password if required." % username)
-    return render_template("login")
+            # If this entry is not identified in farm-data-layout.json as containing nested data, then it will
+            # contain a list of strings
+            updated_content[main_key] = values
+
+    update_farm_content(farmname, updated_content)
+    redirect('/Development20180422_frameworks/editfarm')
 #
 
 @route('/admin')
@@ -344,15 +374,7 @@ def admin():
     return render_template('admin', admins=admins, editors=editors, farms=farms)
 #
 
-@route('/contact')
-def contact():
-    return render_template('contact')
-#
 
-@route('/resources')
-def resources():
-    return render_template('resources')
-#
 
 
 """
