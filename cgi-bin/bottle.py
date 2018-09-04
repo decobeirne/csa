@@ -2111,7 +2111,7 @@ class ConfigDict(dict):
         while stack:
             prefix, source = stack.pop()
             if not isinstance(source, dict):
-                raise TypeError('Source is not a dict (r)' % type(key))
+                raise TypeError('Source is not a dict (%r)' % type(source))
             for key, value in source.items():
                 if not isinstance(key, basestring):
                     raise TypeError('Key is not a string (%r)' % type(key))
@@ -2413,26 +2413,7 @@ class FileUpload(object):
 ###############################################################################
 # Application Helper ###########################################################
 ###############################################################################
-ROOT_DIR = '../httpdocs/communitysupportedagriculture.ie/Development20180422_frameworks'
-TMP_DIR = ROOT_DIR + '/tmp'
 
-def debug_msg(msg):
-    cwd = os.getcwd()
-    try:
-        os.chdir(tmp)
-        filepath = "debug.txt"
-        if os.path.isfile(filepath):
-            fd = open(filepath, "w")
-        else:
-            fd = open(filepath, "a")
-        fd.write(msg)
-        fd.write("\n")
-        fd.close()
-    except:
-        pass
-    finally:
-        os.chdir(cwd)
-    pass
 
 def abort(code=500, text='Unknown Error.'):
     """ Aborts execution and causes a HTTP error. """
@@ -2448,11 +2429,6 @@ def redirect(url, code=None):
     res.status = code
     res.body = ""
     res.set_header('Location', urljoin(request.url, url))
-    
-    if hasattr(response, '_cookies') and hasattr(res, '_cookies') and response._cookies and not res._cookies:
-        pass
-        debug_msg("Cookies wiped")
-        
     raise res
 
 
@@ -3430,7 +3406,6 @@ class SimpleTemplate(BaseTemplate):
         env = {}; stdout = []
         for dictarg in args: env.update(dictarg)
         env.update(kwargs)
-        env.update({'flash_messages': []})
         self.execute(stdout, env)
         return ''.join(stdout)
 
