@@ -38,11 +38,11 @@
                     <div class="admin-info-container">
                         <p>Signed in as user <b>{{username}}</b>, with role <b>{{role}}</b></p>
                         % if role == 'admin':
-                            <p><a href="admin">admin page</a></p>
+                            <p><a href="admin">Admin page</a></p>
                         % elif role == 'editor' and farmname:
-                            <p><a href="editfarm">edit {{farmname}} profile</a></p>
+                            <p><a href="editfarm">Edit {{farmname}} profile</a></p>
                         % end
-                        <p><a href="logout">logout</a></p>
+                        <p><a href="logout">Logout</a></p>
                     </div>
                 % end
                 

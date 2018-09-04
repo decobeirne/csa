@@ -338,13 +338,17 @@ def editfarm_post():
 
     updated_content = {}
     for key in sorted(form_keys):
-        values = form.getlist(key)
-
         # Some entries in the farm data contain nested data. E.g. under "info", the editor of the farm profile is 
         # allowed to add or remove key-value pairs, e.g. "Pick up location", which could be an address consisting
         # of multiple strings.
         key_tokens = key.split('$')
         main_key = key_tokens[0]
+        
+        # The form may have some inputs not used here, e.g. inputs for adding new key-value pairs
+        if main_key not in layout['order']:
+            continue
+
+        values = form.getlist(key)
 
         if main_key in nested_inputs:
             # For nested data, the "input" in the form is given the name "main-key$sub-key", e.g. "info$website"

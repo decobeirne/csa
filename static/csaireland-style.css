@@ -87,10 +87,6 @@
     cursor: pointer;
 }
 
-.admin-info-container {
-    border-bottom: 1px solid #92E027;
-}
-
 
 /*
  *
@@ -313,7 +309,7 @@ u {  /* Changes the behaviour of <u></u> tags. */
     border-bottom: 1px solid #92E027;
 }
 
-/* p, ol, form { */
+/* p, ol, form */
 p, ol, textarea, input {
     font-family: "Work Sans";
     font-size: 17px;
@@ -325,11 +321,36 @@ p, ol, textarea, input {
  * Admin
  *
  */
+.edit-farm-container {
+    border: 1px solid #9fc6b9;  /* A bit less saturation than 2A5D4C */
+    /* padding: 2px; */
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
 .edit-farm-container p {
     /* Override large padding in typical paragraphs */
     padding-bottom: 0px;
     margin-top: 15px;
     margin-bottom: 0px;
+}
+
+.subkey-container {
+    border: 1px solid #c5e2d9;  /* Less saturation than 2A5D4C again */
+    /* padding: 2px; */
+    margin: 1px;
+    padding-bottom: 4px;
+}
+
+.admin-info-container {
+    border: 1px solid #2A5D4C;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.admin-info-container p {
+    font-family: "Work Sans";
+    font-size: 13px;
 }
 
 .edit-farm-instruction {
@@ -369,10 +390,30 @@ input {
     box-sizing: border-box;
 }
 
+input.edit-farm-submit {
+    width: auto;
+}
+
 textarea {
     box-sizing: border-box;
     resize: none;
 }
+
+.edit-farm-control {
+    cursor: pointer;
+    font-family: "Work Sans";
+    font-size: 13px;
+    color: #ADAFB2;
+}
+
+.edit-farm-control:hover {
+    color: #92E027
+}
+
+.edit-farm-control-right {
+    float: right;
+}
+
 
 
 
