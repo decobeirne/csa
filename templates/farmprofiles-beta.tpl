@@ -59,7 +59,7 @@ This page profiles some CSA farms in Ireland. There are up to ten active CSA far
                         <span class="profile-info-key">{{subkey}}</span>
                         <br>
                         <span class="profile-info-value">
-                        {{value}}
+                        {{!value}}
                         </span>
                     </p>
                 %end
