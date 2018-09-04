@@ -1,7 +1,7 @@
 {
 "title": "The name of your CSA",
 "images": "One or more images to appear in a slideshow, with optional captions.",
-"info": "Key-value pairs providing information about the CSA",
+"info": "Key-value pairs providing information about the CSA. If adding a website put 'http://' or 'https://' at the front as appropriate",
 "description": "One or more paragraphs describing the CSA. Paragraphs are easier to read if kept to around 100 words or less.",
 "textarea-inputs": ["Representative"]
 }

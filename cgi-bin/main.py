@@ -157,13 +157,18 @@ def resources():
 
 @get('/farmprofiles-beta')
 def farmprofiles_beta_get():
+    def fixup_url(url):
+        if url.startswith('http://') or url.startswith('https://'):
+            return url
+        return 'http://' + url
+
     farm_dict = json.load(open(os.path.join(DATA_DIR, 'farms.json'), 'rb'))
     farms = farm_dict['farms']
     farm_content_dict = {}
     for farmname in farms:
         farm_content = get_farm_content(farmname)
         farm_content_dict[farmname] = farm_content
-    return render_template('farmprofiles-beta', farm_content_dict=farm_content_dict)
+    return render_template('farmprofiles-beta', farm_content_dict=farm_content_dict, fixup_url=fixup_url)
 #
 
 #

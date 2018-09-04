@@ -50,7 +50,8 @@ This page profiles some CSA farms in Ireland. There are up to ten active CSA far
                 % subkeys = sorted(farm_content["info"].keys())
                 %for subkey in subkeys:
                     <%
-                    convert_to_a = lambda x: '<a href="%s">%s</a>' % (x, x)
+                    # fixup_url should have been passed to render()
+                    convert_to_a = lambda x: '<a href="%s">%s</a>' % (fixup_url(x), fixup_url(x))
                     values = farm_content["info"][subkey]
                     values = [convert_to_a(x) for x in values] if (subkey == "Website") else values
                     value = "<br>".join(values)
