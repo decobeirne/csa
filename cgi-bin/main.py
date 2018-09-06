@@ -157,10 +157,24 @@ def resources():
 
 @get('/farmprofiles-beta')
 def farmprofiles_beta_get():
+    data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
+
     def fixup_url(url):
         if url.startswith('http://') or url.startswith('https://'):
             return url
         return 'http://' + url
+
+    def order_info_keys(keys):
+        keys = sorted(keys)
+        required_keys = []
+        for key in data_layout['required-nested-inputs']:
+            if key in keys:
+                keys.remove(key)
+                required_keys.append(key)
+        required_keys = reversed(sorted(required_keys))
+        for key in required_keys:
+            keys.insert(0, key)
+        return keys
 
     farm_dict = json.load(open(os.path.join(DATA_DIR, 'farms.json'), 'rb'))
     farms = farm_dict['farms']
@@ -168,7 +182,7 @@ def farmprofiles_beta_get():
     for farmname in farms:
         farm_content = get_farm_content(farmname)
         farm_content_dict[farmname] = farm_content
-    return render_template('farmprofiles-beta', farm_content_dict=farm_content_dict, fixup_url=fixup_url)
+    return render_template('farmprofiles-beta', farm_content_dict=farm_content_dict, fixup_url=fixup_url, order_info_keys=order_info_keys)
 #
 
 #
@@ -182,10 +196,10 @@ def login_get():
 
 # TODO: NB save passwords as hash+salt in a db instead of as raw text
 FARM_PERMISSIONS = {
-    'declan': {'role': 'admin', 'password': 'declan'},
-    'roisin': {'role': 'admin', 'password': 'roisin'},
-    'seamus': {'role': 'editor', 'password': 'seamus', 'farmname': 'cloughjordan'},
-    'paddy': {'role': 'editor', 'password': 'paddy', 'farmname': 'cloughjordan'},
+    # 'declan': {'role': 'admin', 'password': 'declan'},
+    # 'roisin': {'role': 'admin', 'password': 'roisin'},
+    # 'seamus': {'role': 'editor', 'password': 'seamus', 'farmname': 'cloughjordan'},
+    'Pat': {'role': 'editor', 'password': 'Pat', 'farmname': 'cloughjordan'},
 }
 
 
@@ -318,7 +332,11 @@ def editfarm():
     content = get_farm_content(farmname)
     instructions = json.load(open(os.path.join(DATA_DIR, 'farm-data-instructions.json'), 'rb'))
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
-    return render_template('editfarm', farmname=farmname, username=username, role=role, content=content, instructions=instructions, data_layout=data_layout)
+
+    def format_instructions(instructions):
+        return '<br>'.join("<i class='fa fa-info-circle'></i> %s" % x for x in instructions)
+
+    return render_template('editfarm', farmname=farmname, username=username, role=role, content=content, instructions=instructions, data_layout=data_layout, format_instructions=format_instructions)
 #
 
 from HTMLParser import HTMLParser
@@ -335,8 +353,44 @@ def editfarm_post():
     # the logic here matches the "inputs" in that form.
     layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
     nested_inputs = layout['nested-inputs']
-
     updated_content = {}
+
+    # Deal with images on their own before going through other items
+    images = form["images"] if ("images" in form) else []
+    if type(images) != list:
+        debug_msg("asdfasdfadfs IMAGES not a list")
+        images = [images]
+    
+    # First get existing images, not those from file inputs
+    values = form.getlist("images$existing")
+
+    for image in images:
+        if image.filename:
+            # Write image to file
+            debug_msg("filename is %s" % image.filename)
+            dest = os.path.join(IMAGES_DIR, 'uploads', farmname, os.path.basename(image.filename))
+            if os.path.isfile(dest):
+                debug_msg("Upload image already on disk: %s" % dest)
+            else:
+                dest_dir = os.path.dirname(dest)
+                if not os.path.isdir(dest_dir):
+                    os.makedirs(dest_dir)
+                debug_msg("Uploading to %s" % dest)
+                dest_file = open(dest, 'wb', 1000)
+                while True:
+                    packet = image.file.read(1000)
+                    if not packet:
+                        break
+                    dest_file.write(packet)
+                dest_file.close()
+            
+            # Add path
+            rel_dest = os.path.relpath(dest, ROOT_DIR)
+            values.append(rel_dest)
+
+    # Add image paths to dict
+    updated_content["images"] = values
+
     for key in sorted(form_keys):
         # Some entries in the farm data contain nested data. E.g. under "info", the editor of the farm profile is 
         # allowed to add or remove key-value pairs, e.g. "Pick up location", which could be an address consisting
@@ -346,6 +400,10 @@ def editfarm_post():
         
         # The form may have some inputs not used here, e.g. inputs for adding new key-value pairs
         if main_key not in layout['order']:
+            continue
+
+        # New images, "images", and "images-existing", have been dealt with above
+        if main_key == "images":
             continue
 
         values = form.getlist(key)

@@ -3,5 +3,5 @@
 "single-value-inputs": ["title"],
 "nested-inputs": ["info"],
 "textarea-inputs": ["description"],
-"required-nested-inputs": ["Representative"]
+"required-nested-inputs": ["Rep"]
 }

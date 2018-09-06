@@ -49,6 +49,9 @@ function addKeyValuePair(clickedElement, key) {
     subkeyContainer.appendChild(controlsPara);
     
     topContainer.insertBefore(subkeyContainer, paraParent);
+    
+    // Blank the input
+    newSubkeyInput.value = "";
 }
 
 
@@ -64,7 +67,7 @@ function deleteInput(clickedElement) {
     subkeyContainer.removeChild(parent);
 }
 
-function addInput(clickedElement, inputName, isTextarea) {
+function addInput(clickedElement, inputName, type = "input") {
     // E.g. <textarea rows="8" name= "{key}">{item}</textarea>
     var parent = clickedElement.parentNode;  // E.g. <div class="input-container">
     var subkeyContainer = parent.parentNode;  // E.g. <div class="subkey-container">, <div class="edit-farm-container">
@@ -72,11 +75,16 @@ function addInput(clickedElement, inputName, isTextarea) {
     var inputContainer = document.createElement("div");
     inputContainer.classList.add("input-container")
 
-    if (isTextarea === true) {
+    if (type == "textarea") {
         var textarea = document.createElement("textarea")
         textarea.rows = "8"
         textarea.name = inputName;
         inputContainer.appendChild(textarea)
+    } else if (type == "image") {
+        var input = document.createElement("input")
+        input.type = "file";
+        input.name = inputName;
+        inputContainer.appendChild(input)
     } else {
         var input = document.createElement("input")
         input.type = "text";
@@ -98,7 +106,7 @@ function addInput(clickedElement, inputName, isTextarea) {
 }
 </script>
 
-<form method="post" action="editfarm">
+<form method="post" enctype="multipart/form-data" action="editfarm">
     <!-- Including the farmname as a hidden input allows for error checking in the post function -->
     <input type="hidden" name="farmname" value="{{farmname}}">
 
@@ -108,16 +116,22 @@ function addInput(clickedElement, inputName, isTextarea) {
     % nested_inputs = data_layout['nested-inputs']
     % required_nested_inputs = data_layout['required-nested-inputs']
 
+
+    % top_instructions = format_instructions(instructions['top'])
+    <p class="edit-farm-instruction">
+        {{!top_instructions}}
+    </p>
+    
     <!-- Iterate through keys as listed in instruction dict -->
     % for key in keys:
-        % instruction = instructions[key]
+        % instruction = format_instructions(instructions[key])
         % value = content[key]
         <!-- Key "{{key}}" -->
 
         <div class="edit-farm-container">
             % title = key.capitalize()
             <p class="edit-farm-key">{{title}}</p>
-            <p class="edit-farm-instruction">{{instruction}}</p>
+            <p class="edit-farm-instruction">{{!instruction}}</p>
 
             % if key in nested_inputs:
             <!-- Key "{{key}}" contains nested values, e.g. key is "info" in "info": {"Website": ["cloughjordancommunityfarm.ie"]} -->
@@ -136,16 +150,16 @@ function addInput(clickedElement, inputName, isTextarea) {
                                 <input type="text" name="{{key}}${{subkey}}" value="{{subitem}}">
 
                                 % if subkey not in required_nested_inputs:
-                                <!-- Control to delete this value under the subkey -->
-                                <span class="edit-farm-control edit-farm-control-right" onclick="deleteInput(this)">Delete entry</span>
-                                %end
+                                    <!-- Control to delete this value under the subkey -->
+                                    <span class="edit-farm-control edit-farm-control-right" onclick="deleteInput(this)">Delete entry</span>
+                                % end
                             </div>
                         % end
 
                         % if subkey not in required_nested_inputs:
                         <p>
                             <!-- Control to add new entry under subkey "{{subkey}}" -->
-                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}${{subkey}}', false)">Add entry</span>
+                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}${{subkey}}')">Add entry</span>
                             <br>
                             <!-- Control to delete the key-value pair -->
                             <span class="edit-farm-control" onclick="deleteKeyValuePair(this)">Delete this key-value pair</span>
@@ -155,7 +169,11 @@ function addInput(clickedElement, inputName, isTextarea) {
 
                 <!-- End of subkey "{{subkey}}" -->
                 % end
-                
+
+                <p class="edit-farm-instruction">
+                    % instruction = format_instructions(instructions["add-key-value-pair"])
+                    {{!instruction}}
+                </p>
                 <p>
                     <!-- Control to add new key-value pair -->
                     <input type="text" name="new-subkey">
@@ -172,7 +190,12 @@ function addInput(clickedElement, inputName, isTextarea) {
                         % if key in textarea_inputs:
                             <textarea rows="8" name= "{{key}}">{{item}}</textarea>
                         % else:
-                            <input type="text" name="{{key}}" value="{{item}}">
+                            % if key == "images":
+                                <input type="text" name="{{key}}$existing" value="{{item}}" style="background-color:#e3ede9" readonly>
+                                <img src="{{item}}"/>
+                            % else:
+                                <input type="text" name="{{key}}" value="{{item}}">
+                            % end
                         % end
                         
                         % if key not in single_value_inputs:
@@ -188,12 +211,16 @@ function addInput(clickedElement, inputName, isTextarea) {
                 <!-- Control to add a new string -->
                 <p>
                     % if key in textarea_inputs:
-                        <span class="edit-farm-control" onclick="addInput(this, '{{key}}', true)">Add entry</span>
+                        <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'textarea')">Add entry</span>
                     % else:
-                        <span class="edit-farm-control" onclick="addInput(this, '{{key}}', false)">Add entry</span>
-                    %end
+                        % if key == "images":
+                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'image')">Add entry</span>
+                        % else:
+                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}')">Add entry</span>
+                        % end
+                    % end
                 </p>
-                %end
+                % end
 
             <!-- End of key "{{key}}" that doesn't contain nested values -->
             % end
@@ -202,6 +229,12 @@ function addInput(clickedElement, inputName, isTextarea) {
         <!-- End of key "{{key}}" -->
     % end
     <!-- End of key in keys -->
+
+    % instruction = format_instructions(instructions['bottom'])
+    <p class="edit-farm-instruction">
+        {{!instruction}}
+    </p>
+
     <div class="input-container">
         <input class="edit-farm-submit" type="submit" value="Update farm">
         <input class="edit-farm-submit" type="submit" formmethod="GET" value="Cancel">

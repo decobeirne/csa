@@ -1,7 +1,9 @@
 {
-"title": "The name of your CSA",
-"images": "One or more images to appear in a slideshow, with optional captions.",
-"info": "Key-value pairs providing information about the CSA. If adding a website put 'http://' or 'https://' at the front as appropriate",
-"description": "One or more paragraphs describing the CSA. Paragraphs are easier to read if kept to around 100 words or less.",
-"textarea-inputs": ["Representative"]
+"top": ["Update your farm profile by editing the text boxes below and clicking <b>Update farm</b> at the bottom of the page.", "To undo any changes, click <b>Cancel</b> to refresh the page with the existing profile.", "After updating, you'll be able to see the changes on the <b>Farm Profiles</b> page"],
+"bottom": ["<b>Update farm</b> will save your changes to the database.", "<b>Cancel</b> will wipe all your changes and retrieve the existing farm profile from the database."],
+"add-key-value-pair": ["To add an additional key-value pair, enter the desired key in the text box and click the link underneath", "A key would be e.g. <b>Website</b> while the value might be <b>http://blahblah.com</b>"],
+"title": ["The name of your CSA"],
+"images": ["Image to appear at the top of the farm profile", "Also, additional images may be added and will appear in the slideshow on the front page.", "(TODO: You'll be able to select which image to use as your profile. For now the first one is taken)", "(TODO: You'll be able to add captions when the website is ready)"],
+"info": ["Key-value pairs providing information about the CSA.", "If entering a website please put 'http://' or 'https://' at the front as appropriate"],
+"description": ["One or more paragraphs describing the CSA.", "Paragraphs are easier to read if kept to around 100 words or less."]
 }

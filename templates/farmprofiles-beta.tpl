@@ -33,21 +33,20 @@ This page profiles some CSA farms in Ireland. There are up to ten active CSA far
         %if len(farm_content["images"]) > 0:
             <div class="profile-img-container">
                 <!-- E.g. "images/profile/profile-cloughjordan.jpg" -->
-                <img src="{{farm_content["images"][0]"/>
+                <img src="{{farm_content["images"][0]}}"/>
             </div>
         %end
-        
 
         <div class="profile-flex-container">
             <div class="profile-left-container">
                 <div class="profile-map-container">
                     <!-- TODO: we could just have each farm input their coordinates here -->
                     <!-- E.g. "images/map-cloughjordan.png" -->
-                    <img src="images/map-{{farmname}}.png"/>
+                    <img src="images/maps/map-{{farmname}}.png"/>
                 </div>
                 
                 <!-- TODO: we could put "Representative" first if required -->
-                % subkeys = sorted(farm_content["info"].keys())
+                % subkeys = order_info_keys(farm_content["info"].keys())
                 %for subkey in subkeys:
                     <%
                     # fixup_url should have been passed to render()
@@ -61,6 +60,9 @@ This page profiles some CSA farms in Ireland. There are up to ten active CSA far
                         <br>
                         <span class="profile-info-value">
                         {{!value}}
+                        % if subkey == "Rep":
+                            <a href="editfarm"><i title="Click to edit this farm profile" class="fa fa-edit"></i></a>
+                        % end
                         </span>
                     </p>
                 %end

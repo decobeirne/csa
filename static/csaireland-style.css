@@ -346,11 +346,12 @@ p, ol, textarea, input {
     border: 1px solid #2A5D4C;
     margin-top: 1px;
     margin-bottom: 1px;
+    background-color: #e3ede9;  /* Very light version of 2A5D4C */
 }
 
 .admin-info-container p {
     font-family: "Work Sans";
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .edit-farm-instruction {
@@ -402,7 +403,7 @@ textarea {
 .edit-farm-control {
     cursor: pointer;
     font-family: "Work Sans";
-    font-size: 13px;
+    font-size: 15px;
     color: #ADAFB2;
 }
 

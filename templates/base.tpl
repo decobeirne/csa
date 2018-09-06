@@ -8,6 +8,7 @@
         <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
         <link href="static/csaireland-style.css" type="text/css" rel="stylesheet"/>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
         <script src="static/setup-links.js" type="text/javascript"></script>
     </head>
     <body>
@@ -36,13 +37,18 @@
                 
                 % if username:
                     <div class="admin-info-container">
-                        <p>Signed in as user <b>{{username}}</b>, with role <b>{{role}}</b></p>
-                        % if role == 'admin':
-                            <p><a href="admin">Admin page</a></p>
-                        % elif role == 'editor' and farmname:
-                            <p><a href="editfarm">Edit {{farmname}} profile</a></p>
-                        % end
-                        <p><a href="logout">Logout</a></p>
+                        <p>
+                            Signed in as user <b>{{username}}</b>, with role <b>{{role}}</b>
+                            <br>
+                            % if role == 'admin':
+                                <a href="admin">Admin page</a>
+                                <br>
+                            % elif role == 'editor' and farmname:
+                                <a href="editfarm">Edit {{farmname}} profile</a>
+                                <br>
+                            % end
+                            <a href="logout">Logout</a>
+                        </p>
                     </div>
                 % end
                 
