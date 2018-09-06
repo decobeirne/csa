@@ -13,7 +13,7 @@ from bottle import route, get, post, run, request, response, template, SimpleTem
 # Defines
 #
 
-ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie/Development20180422_frameworks')
+ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie/beta1809')
 TPL_DIR = ROOT_DIR + '/templates'
 IMAGES_DIR = ROOT_DIR + '/images'
 STATIC_DIR = ROOT_DIR + '/static'
@@ -25,7 +25,6 @@ REQ_FLASH_MSGS_READ = False
 LINKS = OrderedDict([
     ('About', {'link': 'about'}),
     ('Farm Profiles', {'link': 'farmprofiles'}),
-    ('Farm Profiles Beta', {'link': 'farmprofiles-beta'}),
     ('Resources', {'link': 'resources'}),
     ('Contact', {'link': 'contact'}),
     ('Facebook', {'link': 'https://www.facebook.com/groups/245019725582313', 'tags': 'target="_blank"'}),
@@ -140,11 +139,6 @@ def about():
     return render_template('about')
 #
 
-@route('/farmprofiles')
-def farmprofiles():
-    return render_template('farmprofiles')
-#
-
 @route('/contact')
 def contact():
     return render_template('contact')
@@ -155,7 +149,7 @@ def resources():
     return render_template('resources')
 #
 
-@get('/farmprofiles-beta')
+@get('/farmprofiles')
 def farmprofiles_beta_get():
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
 
@@ -182,7 +176,7 @@ def farmprofiles_beta_get():
     for farmname in farms:
         farm_content = get_farm_content(farmname)
         farm_content_dict[farmname] = farm_content
-    return render_template('farmprofiles-beta', farm_content_dict=farm_content_dict, fixup_url=fixup_url, order_info_keys=order_info_keys)
+    return render_template('farmprofiles', farm_content_dict=farm_content_dict, fixup_url=fixup_url, order_info_keys=order_info_keys)
 #
 
 #
@@ -242,9 +236,9 @@ def login_post():
         auth_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         flash_message("Authenticated user <b>%s</b> on %s" % (username, auth_time))
         if role == 'admin':
-            redirect('/Development20180422_frameworks/admin')
+            redirect('/beta1809/admin')
         else:
-            redirect('/Development20180422_frameworks/editfarm')
+            redirect('/beta1809/editfarm')
     flash_message("Authentication for user <b>%s</b> failed. Please contact admin to reset your password if required." % username)
     return render_template("login")
 #
@@ -255,7 +249,7 @@ def logout():
     clear_session()
     if username:
         flash_message("Signed out user <b>%s</b>" % username)
-    redirect('/Development20180422_frameworks/login')
+    redirect('/beta1809/login')
 #
 
 # Ref: http://flask.pocoo.org/docs/0.12/patterns/viewdecorators/
@@ -268,10 +262,10 @@ def farm_login_required(f):
         role = request.get_cookie('role', '')
         if username and role == 'admin':
             flash_message("Redirected. Do not have permission to edit farm profile.")
-            redirect('/Development20180422_frameworks/home')
+            redirect('/beta1809/home')
         if not username or role != 'editor':
             # TODO: check farm profile also - for now only have one farm
-            redirect('/Development20180422_frameworks/login')
+            redirect('/beta1809/login')
         return f(*args, **kwargs)
     return decorated_function
 #
@@ -283,9 +277,9 @@ def admin_login_required(f):
         role = request.get_cookie('role', '')
         if username and role == 'editor':
             flash_message("Redirected. Do not have access to admin page.")
-            redirect('/Development20180422_frameworks/home')
+            redirect('/beta1809/home')
         if not username or role != 'admin':
-            redirect('/Development20180422_frameworks/login')
+            redirect('/beta1809/login')
         return f(*args, **kwargs)
     return decorated_function
 #
@@ -420,7 +414,7 @@ def editfarm_post():
             updated_content[main_key] = values
 
     update_farm_content(farmname, updated_content)
-    redirect('/Development20180422_frameworks/editfarm')
+    redirect('/beta1809/editfarm')
 #
 
 @route('/admin')
