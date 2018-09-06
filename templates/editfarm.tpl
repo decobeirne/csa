@@ -67,7 +67,7 @@ function deleteInput(clickedElement) {
     subkeyContainer.removeChild(parent);
 }
 
-function addInput(clickedElement, inputName, type = "input") {
+function addInput(clickedElement, inputName, type) {
     // E.g. <textarea rows="8" name= "{key}">{item}</textarea>
     var parent = clickedElement.parentNode;  // E.g. <div class="input-container">
     var subkeyContainer = parent.parentNode;  // E.g. <div class="subkey-container">, <div class="edit-farm-container">
@@ -159,7 +159,7 @@ function addInput(clickedElement, inputName, type = "input") {
                         % if subkey not in required_nested_inputs:
                         <p>
                             <!-- Control to add new entry under subkey "{{subkey}}" -->
-                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}${{subkey}}')">Add entry</span>
+                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}${{subkey}}', 'input')">Add entry</span>
                             <br>
                             <!-- Control to delete the key-value pair -->
                             <span class="edit-farm-control" onclick="deleteKeyValuePair(this)">Delete this key-value pair</span>
@@ -216,7 +216,7 @@ function addInput(clickedElement, inputName, type = "input") {
                         % if key == "images":
                             <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'image')">Add entry</span>
                         % else:
-                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}')">Add entry</span>
+                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'input')">Add entry</span>
                         % end
                     % end
                 </p>
