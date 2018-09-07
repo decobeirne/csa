@@ -13,7 +13,7 @@ from bottle import route, get, post, run, request, response, template, SimpleTem
 # Defines
 #
 
-ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie/beta1809')
+ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie/beta1810')
 TPL_DIR = ROOT_DIR + '/templates'
 IMAGES_DIR = ROOT_DIR + '/images'
 STATIC_DIR = ROOT_DIR + '/static'
@@ -236,9 +236,9 @@ def login_post():
         auth_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         flash_message("Authenticated user <b>%s</b> on %s" % (username, auth_time))
         if role == 'admin':
-            redirect('/beta1809/admin')
+            redirect('/beta1810/admin')
         else:
-            redirect('/beta1809/editfarm')
+            redirect('/beta1810/editfarm')
     flash_message("Authentication for user <b>%s</b> failed. Please contact admin to reset your password if required." % username)
     return render_template("login")
 #
@@ -249,7 +249,7 @@ def logout():
     clear_session()
     if username:
         flash_message("Signed out user <b>%s</b>" % username)
-    redirect('/beta1809/login')
+    redirect('/beta1810/login')
 #
 
 # Ref: http://flask.pocoo.org/docs/0.12/patterns/viewdecorators/
@@ -262,10 +262,10 @@ def farm_login_required(f):
         role = request.get_cookie('role', '')
         if username and role == 'admin':
             flash_message("Redirected. Do not have permission to edit farm profile.")
-            redirect('/beta1809/home')
+            redirect('/beta1810/home')
         if not username or role != 'editor':
             # TODO: check farm profile also - for now only have one farm
-            redirect('/beta1809/login')
+            redirect('/beta1810/login')
         return f(*args, **kwargs)
     return decorated_function
 #
@@ -277,9 +277,9 @@ def admin_login_required(f):
         role = request.get_cookie('role', '')
         if username and role == 'editor':
             flash_message("Redirected. Do not have access to admin page.")
-            redirect('/beta1809/home')
+            redirect('/beta1810/home')
         if not username or role != 'admin':
-            redirect('/beta1809/login')
+            redirect('/beta1810/login')
         return f(*args, **kwargs)
     return decorated_function
 #
@@ -414,7 +414,7 @@ def editfarm_post():
             updated_content[main_key] = values
 
     update_farm_content(farmname, updated_content)
-    redirect('/beta1809/editfarm')
+    redirect('/beta1810/editfarm')
 #
 
 @route('/admin')

@@ -1,4 +1,4 @@
 Options +FollowSymlinks
 RewriteEngine On
 
-RewriteRule ^(.*)$ /cgi-bin/main.py/$1 [L,NC,QSA]
+RewriteRule ^(.*)$ /cgi-bin/main_beta1810.py/$1 [L,NC,QSA]
