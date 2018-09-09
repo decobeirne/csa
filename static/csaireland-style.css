@@ -352,6 +352,7 @@ p, ol, textarea, input {
 .admin-info-container p {
     font-family: "Work Sans";
     font-size: 15px;
+    line-height: 1.5em;
 }
 
 .edit-farm-instruction {
