@@ -9,7 +9,7 @@
         <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
         <link href="static/csaireland-style.css" type="text/css" rel="stylesheet"/>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-        <script src="static/setup-links.js" type="text/javascript"></script>
+        <script src="static/slideshow.js" type="text/javascript"></script>
     </head>
     <body>
         <div id="top-level-container">
