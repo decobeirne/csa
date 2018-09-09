@@ -1,11 +1,6 @@
 % rebase('base.tpl')
 
 <script>
-var setup = function() {
-    setupLinks();
-};
-window.onload = setup;
-
 function addKeyValuePair(clickedElement, key) {
     var paraParent = clickedElement.parentNode; // <p>
     var newSubkeyInput = paraParent.firstElementChild;

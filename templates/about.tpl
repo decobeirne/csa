@@ -16,7 +16,6 @@ var setup = function() {
         ];
     addSlideImgs("images/slideshow/", slideFilenames, showCaptions=false);
     setupSlideEvents();
-    setupLinks();
 };
 window.onload = setup;
 </script>

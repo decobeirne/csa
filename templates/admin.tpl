@@ -1,12 +1,5 @@
 % rebase('base.tpl')
 
-<script>
-var setup = function() {
-    setupLinks();
-};
-window.onload = setup;
-</script>
-
 <div class="admin-container">
     <h3>Admins</h3>
     % for admin in admins:

@@ -1,12 +1,5 @@
 % rebase('base.tpl')
 
-<script>
-var setup = function() {
-    setupLinks();
-};
-window.onload = setup;
-</script>
-
 <h2>Resources</h2>
 <p>
     <a href="downloadable/European-CSA-Declaration.pdf">European CSA Declaration</a>

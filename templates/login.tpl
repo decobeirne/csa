@@ -1,12 +1,5 @@
 % rebase('base.tpl')
 
-<script>
-var setup = function() {
-    setupLinks();
-};
-window.onload = setup;
-</script>
-
 <form method="post" action="login">
     <p>username <input type="text" name="username"</p>
     <p>password <input type="password" name="password"</p>

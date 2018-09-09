@@ -1,12 +1,5 @@
 % rebase('base.tpl')
 
-<script>
-var setup = function() {
-    setupLinks();
-};
-window.onload = setup;
-</script>
-
 <!-- Override style instead of defining new classes. margin-top here matches the margin around a h2. -->
 <div class="profile-top-container" style="margin-top:40px;">
     <div class="profile-flex-container">

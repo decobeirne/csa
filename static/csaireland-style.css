@@ -7,7 +7,6 @@
     margin: auto;
     width: 80%;
     max-width: 818px;
-    visibility: hidden;  /* Hide until everything is loaded to avoid jitter. */
 }
 
 #banner-container-top {
