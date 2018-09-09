@@ -1,8 +1,3 @@
-function setupLinks() {
-    // Once the links have been added make everything visible
-    document.getElementById("top-level-container").style.visibility = "visible";  // setAttribute does not work for style on IE
-}
-
 function addSlideImgs(slideImgsDir, slideFilenames, showCaptions) {
     var container = document.querySelector('.slideshow-container');
     var containerHeight = container.clientHeight.toString() + "px";
