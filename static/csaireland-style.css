@@ -387,6 +387,16 @@ textarea, input {
     width: 100%;
 }
 
+input[type=checkbox] {
+    width: auto;
+}
+
+input[type=checkbox] {
+    position: relative;
+    vertical-align: middle;
+    margin: 0px 0px 0px 4px;
+}
+
 input {
     box-sizing: border-box;
 }
@@ -400,7 +410,7 @@ textarea {
     resize: none;
 }
 
-.edit-farm-control {
+.edit-farm-control, .edit-farm-control-no-hover {
     cursor: pointer;
     font-family: "Work Sans";
     font-size: 15px;
@@ -411,11 +421,15 @@ textarea {
     color: #92E027
 }
 
-.edit-farm-control-right {
-    float: right;
+div.edit-farm-align-right {
+    /*
+    Was previously making the span float to right, but this would cause the span
+    to flow outside of the parent div, so using this div to instead control text
+    alignment works better.
+    */
+    width: 100%;
+    text-align: right;
 }
-
-
 
 
 /*

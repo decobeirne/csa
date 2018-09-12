@@ -49,56 +49,58 @@ function addKeyValuePair(clickedElement, key) {
     newSubkeyInput.value = "";
 }
 
-
 function deleteKeyValuePair(clickedElement) {
     var paraParent = clickedElement.parentNode; // <p>
     var subKeyCont = paraParent.parentNode; // <div class="subkey-container">
     subKeyCont.parentNode.removeChild(subKeyCont)
 }
 
-function deleteInput(clickedElement) {
-    var parent = clickedElement.parentNode;  // E.g. <div class="input-container"> -- want to delete this
-    var subkeyContainer = parent.parentNode;  // E.g. <div class="subkey-container">, <div class="edit-farm-container">
-    subkeyContainer.removeChild(parent);
+function deleteInput(elm) {
+    // No advantage to using jquery here
+    var inputContainer = elm.parentNode.parentNode;  // E.g. <div class="input-container"><div class="edit-farm-align-right">
+    var subkeyContainer = inputContainer.parentNode;  // E.g. <div class="subkey-container">, <div class="edit-farm-container">
+    subkeyContainer.removeChild(inputContainer);
 }
 
-function addInput(clickedElement, inputName, type) {
-    // E.g. <textarea rows="8" name= "{key}">{item}</textarea>
-    var parent = clickedElement.parentNode;  // E.g. <div class="input-container">
-    var subkeyContainer = parent.parentNode;  // E.g. <div class="subkey-container">, <div class="edit-farm-container">
-    
-    var inputContainer = document.createElement("div");
-    inputContainer.classList.add("input-container")
+$(function () {
+    addInput = function (elm, inputName, type) {
+        // E.g. <textarea rows="8" name= "{key}">{item}</textarea>
+        var parent = elm.parentNode;  // E.g. <div class="input-container">
+        var newContainer = $('<div class="input-container"></div>');
 
-    if (type == "textarea") {
-        var textarea = document.createElement("textarea")
-        textarea.rows = "8"
-        textarea.name = inputName;
-        inputContainer.appendChild(textarea)
-    } else if (type == "image") {
-        var input = document.createElement("input")
-        input.type = "file";
-        input.name = inputName;
-        inputContainer.appendChild(input)
-    } else {
-        var input = document.createElement("input")
-        input.type = "text";
-        input.name = inputName;
-        input.value = "";
-        inputContainer.appendChild(input)
-    }
+        if (type == "textarea") {
+            newContainer.append('<textarea rows="8" name="' + inputName + '"></textarea>');
+        } else if (type == "image") {
+            newContainer.append('<input type="file" class="image-input" name="' + inputName + '">');
+        } else {
+            newContainer.append('<input type="text" name="' + inputName + '" value="">');
+        }
+
+        if (type == "image") {
+            newContainer.append('<div class="edit-farm-align-right"><span class="edit-farm-control-no-hover">Select as profile image<input type="checkbox" class="is-default-image" name="" disabled></span></div>');
+        }
+        newContainer.append('<div class="edit-farm-align-right"><span class="edit-farm-control" onclick="deleteInput(this)">Delete entry</span></div>');
+
+        newContainer.insertBefore(parent);
+    };
+});
+
+$(document).ready(function(){
+    // If an image is selected as the profile image, unset any previously selected image
+    $('form').on('click', '.is-default-image', function() {
+        $('.is-default-image').not(this).prop('checked', false);
+    });
     
-    var deletePara = document.createElement("span");
-    deletePara.classList.add("edit-farm-control")
-    deletePara.classList.add("edit-farm-control-right")
-    deletePara.onclick = function(){deleteInput(deletePara)};
-    
-    var deleteTextNode = document.createTextNode("Delete entry");
-    deletePara.appendChild(deleteTextNode)
-    inputContainer.appendChild(deletePara)
-    
-    subkeyContainer.insertBefore(inputContainer, parent)
-}
+    //If a file is selected for upload, enable the checkbox beside this
+    $('form').on('change', '.image-input', function(e) {
+        var disabled = (this.files.length == 0);
+        var input = $(this).parent().children('div:first').children('span:first').children('input:first');
+        input.prop('disabled', disabled);
+        if (disabled) {
+            input.prop('checked', false);
+        }
+    });
+});
 </script>
 
 <form method="post" enctype="multipart/form-data" action="editfarm">
@@ -146,7 +148,9 @@ function addInput(clickedElement, inputName, type) {
 
                                 % if subkey not in required_nested_inputs:
                                     <!-- Control to delete this value under the subkey -->
-                                    <span class="edit-farm-control edit-farm-control-right" onclick="deleteInput(this)">Delete entry</span>
+                                    <div class="edit-farm-align-right">
+                                        <span class="edit-farm-control" onclick="deleteInput(this)">Delete entry</span>
+                                    </div>
                                 % end
                             </div>
                         % end
@@ -172,6 +176,8 @@ function addInput(clickedElement, inputName, type) {
                 <p>
                     <!-- Control to add new key-value pair -->
                     <input type="text" name="new-subkey">
+                </p>
+                <p>
                     <span class="edit-farm-control" onclick="addKeyValuePair(this, '{{key}}')">Add key-value pair</span>
                 </p>
             
@@ -186,8 +192,12 @@ function addInput(clickedElement, inputName, type) {
                             <textarea rows="8" name= "{{key}}">{{item}}</textarea>
                         % else:
                             % if key == "images":
+                                % checked = "checked" if (content.get('default-image', '') == item) else ""
                                 <input type="text" name="{{key}}$existing" value="{{item}}" style="background-color:#e3ede9" readonly>
                                 <img src="{{item}}"/>
+                                <div class="edit-farm-align-right">
+                                    <span class="edit-farm-control-no-hover">Select as profile image<input type="checkbox" class="is-default-image" name="is-default-img-{{item}}" {{checked}}/></span>
+                                </div>
                             % else:
                                 <input type="text" name="{{key}}" value="{{item}}">
                             % end
@@ -195,7 +205,9 @@ function addInput(clickedElement, inputName, type) {
                         
                         % if key not in single_value_inputs:
                         <!-- Control to remove this input -->
-                        <span class="edit-farm-control edit-farm-control-right" onclick="deleteInput(this)">Delete entry</span>
+                        <div class="edit-farm-align-right">
+                            <span class="edit-farm-control" onclick="deleteInput(this)">Delete entry</span>
+                        </div>
                         %end
                     </div>
 

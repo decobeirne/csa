@@ -35,7 +35,7 @@ LINKS = OrderedDict([
 # Utility functions
 #
 
-def debug_msg(msg):  # TODO: delete
+def debug_msg(msg):  # TODO: delete / replace with logging
     cwd = os.getcwd()
     try:
         os.chdir(TMP_DIR)
