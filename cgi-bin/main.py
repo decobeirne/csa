@@ -170,13 +170,25 @@ def farmprofiles_beta_get():
             keys.insert(0, key)
         return keys
 
+    def get_profile_image(content):
+        # content.get('default-image', '')
+        # name="is-default-img-{{item}}"
+        default = content.get('default-image', '')
+        images = content.get('images', [])
+        return "" if not images else (default if (default in images) else images[0])
+
     farm_dict = json.load(open(os.path.join(DATA_DIR, 'farms.json'), 'rb'))
     farms = farm_dict['farms']
     farm_content_dict = {}
     for farmname in farms:
         farm_content = get_farm_content(farmname)
         farm_content_dict[farmname] = farm_content
-    return render_template('farmprofiles', farm_content_dict=farm_content_dict, fixup_url=fixup_url, order_info_keys=order_info_keys)
+    return render_template(
+        'farmprofiles',
+        farm_content_dict=farm_content_dict,
+        fixup_url=fixup_url,
+        order_info_keys=order_info_keys,
+        get_profile_image=get_profile_image)
 #
 
 #
@@ -352,7 +364,7 @@ def editfarm_post():
     # Deal with images on their own before going through other items
     images = form["images"] if ("images" in form) else []
     if type(images) != list:
-        debug_msg("asdfasdfadfs IMAGES not a list")
+        debug_msg("Warning: editfarm_post, IMAGES not a list")
         images = [images]
     
     # First get existing images, not those from file inputs
@@ -384,6 +396,14 @@ def editfarm_post():
 
     # Add image paths to dict
     updated_content["images"] = values
+
+    # Set profile image, if selected
+    default_image_token = 'is-default-img-'
+    default_image_keys = [x for x in form_keys if x.startswith(default_image_token)]
+    if default_image_keys:
+        updated_content['default-image'] = default_image_keys[0][len(default_image_token):]
+    debug_msg("keys")
+    debug_msg(str(form_keys))
 
     for key in sorted(form_keys):
         # Some entries in the farm data contain nested data. E.g. under "info", the editor of the farm profile is 

@@ -98,6 +98,10 @@ $(document).ready(function(){
         input.prop('disabled', disabled);
         if (disabled) {
             input.prop('checked', false);
+        } else {
+            // When a new file input for an image is added, the name for the corresponding checkbox is "", as
+            // we don't yet have a filename, so set now
+            input.attr('id', 'is-default-img-' + this.files[0].name)
         }
     });
 });

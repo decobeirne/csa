@@ -26,7 +26,10 @@ This page profiles some CSA farms in Ireland. There are up to ten active CSA far
         %if len(farm_content["images"]) > 0:
             <div class="profile-img-container">
                 <!-- E.g. "images/profile/profile-cloughjordan.jpg" -->
-                <img src="{{farm_content["images"][0]}}"/>
+                % profile_image = get_profile_image(farm_content)
+                % if profile_image:
+                    <img src="{{profile_image}}"/>
+                % end
             </div>
         %end
 
