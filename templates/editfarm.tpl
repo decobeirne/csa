@@ -67,7 +67,6 @@ $(function () {
         // E.g. <textarea rows="8" name= "{key}">{item}</textarea>
         var parent = elm.parentNode;  // E.g. <div class="input-container">
         var newContainer = $('<div class="input-container"></div>');
-
         if (type == "textarea") {
             newContainer.append('<textarea rows="8" name="' + inputName + '"></textarea>');
         } else if (type == "image") {
@@ -75,12 +74,7 @@ $(function () {
         } else {
             newContainer.append('<input type="text" name="' + inputName + '" value="">');
         }
-
-        if (type == "image") {
-            newContainer.append('<div class="edit-farm-align-right"><span class="edit-farm-control-no-hover">Select as profile image<input type="checkbox" class="is-default-image" name="" disabled></span></div>');
-        }
         newContainer.append('<div class="edit-farm-align-right"><span class="edit-farm-control" onclick="deleteInput(this)">Delete entry</span></div>');
-
         newContainer.insertBefore(parent);
     };
 });
@@ -89,20 +83,6 @@ $(document).ready(function(){
     // If an image is selected as the profile image, unset any previously selected image
     $('form').on('click', '.is-default-image', function() {
         $('.is-default-image').not(this).prop('checked', false);
-    });
-    
-    //If a file is selected for upload, enable the checkbox beside this
-    $('form').on('change', '.image-input', function(e) {
-        var disabled = (this.files.length == 0);
-        var input = $(this).parent().children('div:first').children('span:first').children('input:first');
-        input.prop('disabled', disabled);
-        if (disabled) {
-            input.prop('checked', false);
-        } else {
-            // When a new file input for an image is added, the name for the corresponding checkbox is "", as
-            // we don't yet have a filename, so set now
-            input.attr('id', 'is-default-img-' + this.files[0].name)
-        }
     });
 });
 </script>
