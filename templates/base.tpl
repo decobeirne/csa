@@ -7,9 +7,9 @@
         <meta charset="UTF-8">
         <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
-        <link href="static/csaireland-style.css" type="text/css" rel="stylesheet"/>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-        <script src="static/slideshow.js" type="text/javascript"></script>
+        <link href="{{root_rel_dir}}static/csaireland-style.css" type="text/css" rel="stylesheet"/>
+        <script src="{{root_rel_dir}}static/slideshow.js" type="text/javascript"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     </head>
     <body>
@@ -17,7 +17,7 @@
             <div id="banner-container-top">
                 <img class="banner-img" src="../images/veg-header.png"/>
             </div>
-            <div id="heading-container" onclick="location.href='home'" style="cursor:pointer">
+            <div id="heading-container" onclick="location.href='{{root_rel_dir}}home'" style="cursor:pointer">
                 <h1>CSA Network Ireland</h1>
             </div>
             <div id="links-container">
@@ -25,7 +25,7 @@
                     % if vals['link'] == page_name:
                         <div class="active-link-item">{{title}}</div>
                     % else:
-                        <div class="link-item"><a href="{{vals['link']}}" {{!vals.get('tags', '')}}>{{title}}</a></div>
+                        <div class="link-item"><a href="{{root_rel_dir}}{{vals['link']}}" {{!vals.get('tags', '')}}>{{title}}</a></div>
                     % end
                 % end
             </div>
@@ -42,13 +42,13 @@
                             Signed in as user <b>{{username}}</b>, with role <b>{{role}}</b>
                             <br>
                             % if role == 'admin':
-                                <a href="admin">Admin page</a>
+                                <a href="{{root_rel_dir}}admin">Admin page</a>
                                 <br>
                             % elif role == 'editor' and farmname:
-                                <a href="editfarm">Edit {{farmname}} profile</a>
+                                <a href="{{root_rel_dir}}edit/{{farmname}}">Edit {{farmname}} profile</a>
                                 <br>
                             % end
-                            <a href="logout">Logout</a>
+                            <a href="{{root_rel_dir}}logout">Logout</a>
                         </p>
                     </div>
                 % end

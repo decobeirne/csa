@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import cgi
-import datetime
 from collections import OrderedDict
+import datetime
+from functools import wraps
 import json
 import os
 
@@ -24,7 +25,7 @@ REQ_FLASH_MSGS_READ = False
 
 LINKS = OrderedDict([
     ('About', {'link': 'about'}),
-    ('Farm Profiles', {'link': 'farmprofiles'}),
+    ('Farm Profiles', {'link': 'farms'}),
     ('Resources', {'link': 'resources'}),
     ('Contact', {'link': 'contact'}),
     ('Facebook', {'link': 'https://www.facebook.com/groups/245019725582313', 'tags': 'target="_blank"'}),
@@ -106,23 +107,50 @@ def render_template(name, **kwargs):
     cwd = os.getcwd()
     try:
         os.chdir(TPL_DIR)
-        tpl_name = name + '.tpl'
-        if not os.path.isfile(tpl_name):
-            return "Error"  # TODO
-        tpl = SimpleTemplate(source=open(tpl_name).read())
+        tpl = SimpleTemplate(source=open(name + '.tpl').read())
         username = request.get_cookie('username')
         role = request.get_cookie('role')
         farmname = request.get_cookie('farmname')
+        root_rel_dir = '../' * (request.path.count('/') - 1) # E.g. '/foo' == 0 == '', '/foo/bar' == 1 == '../'
         kwargs.update(
             {'page_name': name,
              'links': LINKS,
              'messages_to_flash': get_flash_messages(),  # Retrieve and wipe flash messages
              'username': username,
              'role': role,
-             'farmname': farmname})
+             'farmname': farmname,
+             'root_rel_dir': root_rel_dir})
         return tpl.render(**kwargs)
     finally:
         os.chdir(cwd)
+
+#
+# Data functions
+#
+
+def get_new_farm_content():
+    json_file = get_farm_json_file('new-farm')
+    return json.load(open(json_file, 'rb'))
+#
+
+def get_farm_json_file(farmname):
+    return os.path.join(DATA_DIR, '%s.json' % farmname)
+#
+
+def get_farm_content(farmname):
+    json_file = get_farm_json_file(farmname)
+    if os.path.isfile(json_file):
+        content = json.load(open(json_file, 'rb'))
+    else:
+        content = get_new_farm_content()
+    return content
+#
+
+def update_farm_content(farmname, content):
+    json_file = get_farm_json_file(farmname)
+    debug_msg("update_farm_content json_file is '%s'" % json_file)
+    json.dump(content, open(json_file, 'wb'))
+#
 
 #
 # Regular pages
@@ -149,8 +177,8 @@ def resources():
     return render_template('resources')
 #
 
-@get('/farmprofiles')
-def farmprofiles_beta_get():
+@get('/farms')
+def farmprofiles():
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
 
     def fixup_url(url):
@@ -171,18 +199,17 @@ def farmprofiles_beta_get():
         return keys
 
     def get_profile_image(content):
-        # content.get('default-image', '')
-        # name="is-default-img-{{item}}"
         default = content.get('default-image', '')
         images = content.get('images', [])
         return "" if not images else (default if (default in images) else images[0])
 
-    farm_dict = json.load(open(os.path.join(DATA_DIR, 'farms.json'), 'rb'))
-    farms = farm_dict['farms']
+    permissions_dict = json.load(open(os.path.join(DATA_DIR, 'permissions.json'), 'rb'))
+    farms = permissions_dict['farms']
     farm_content_dict = {}
     for farmname in farms:
         farm_content = get_farm_content(farmname)
         farm_content_dict[farmname] = farm_content
+
     return render_template(
         'farmprofiles',
         farm_content_dict=farm_content_dict,
@@ -194,12 +221,6 @@ def farmprofiles_beta_get():
 #
 # Admin pages
 #
-
-@get('/login')
-def login_get():
-    return render_template('login')
-#
-
 # TODO: NB save passwords as hash+salt in a db instead of as raw text
 FARM_PERMISSIONS = {
     # 'declan': {'role': 'admin', 'password': 'declan'},
@@ -225,14 +246,22 @@ def authenticate(username, password):
     if username and password:
         if username in FARM_PERMISSIONS:
             if 'password' in FARM_PERMISSIONS[username] and password == FARM_PERMISSIONS[username]['password'] and 'role' in FARM_PERMISSIONS[username]:
-                role = FARM_PERMISSIONS[username]['role']
+                # See link for relevance of setting path
                 # https://stackoverflow.com/questions/21215904/read-cookie-text-value-in-a-python-bottle-application
-                bottle.response.set_cookie('farmname', 'cloughjordan', path='/')  # todo temp
+                role = FARM_PERMISSIONS[username]['role']
+                farmname = FARM_PERMISSIONS[username]['farmname']
                 bottle.response.set_cookie('username', username, path='/')
                 bottle.response.set_cookie('role', role, path='/')
-                return role
+                bottle.response.set_cookie('farmname', farmname, path='/')
+                return (username, role, farmname)
     clear_session()
     return None
+#
+
+@get('/login')
+def login_get():
+    # A request for e.g. '/edit/dublin' will have been redirected to '/login?next=edit/dublin'
+    return render_template('login', next=request.query.get('next', ''))
 #
 
 @post('/login')
@@ -241,18 +270,34 @@ def login_post():
     form = cgi.FieldStorage()
     username = cgi.escape(form.getfirst('username', ''))
     password = cgi.escape(form.getfirst('password', ''))
-    bottle.response.set_cookie('foo2', 'bar2', path='/')
-    role = authenticate(username, password)
-    bottle.response.set_cookie('foo3', 'bar3', path='/')
-    if role in ['admin', 'editor']:
+    next = cgi.escape(form.getfirst('next', ''))
+    auth_res = authenticate(username, password)
+
+    auto_ok = False
+    if auth_res is not None:
+        (auth_username, auth_role, auth_farmname) = auth_res
+        if auth_role == 'admin' or auth_role == 'editor':
+            auth_ok = True
+
+    if auth_ok:
         auth_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
-        flash_message("Authenticated user <b>%s</b> on %s" % (username, auth_time))
-        if role == 'admin':
-            redirect('/beta1810/admin')
+        flash_message("Authenticated user <b>%s</b> on %s" % (username, auth_time))  # TODO: should log all this
+        if auth_role == 'admin':
+            # E.g. '/admin' or '/edit/dublin'
+            redirect('/beta1810/%s' % next)
         else:
-            redirect('/beta1810/editfarm')
-    flash_message("Authentication for user <b>%s</b> failed. Please contact admin to reset your password if required." % username)
-    return render_template("login")
+            next_parts = next.split('/')
+            if len(next_parts) == 2 and next_parts[0] == 'edit':
+                if next_parts[1] == auth_farmname:
+                    redirect('/beta1810/%s' % next)
+                else:
+                    flash_message("Redirected. Do not have access permission")
+                    redirect('/beta1810/home')
+            else:
+                redirect('/beta1810/home')
+    else:
+        flash_message("Authentication for user <b>%s</b> failed. Please contact admin to reset your password if required." % username)
+        return render_template("login")
 #
 
 @route('/logout')
@@ -261,77 +306,40 @@ def logout():
     clear_session()
     if username:
         flash_message("Signed out user <b>%s</b>" % username)
-    redirect('/beta1810/login')
+    redirect('/beta1810/home')
 #
 
-# Ref: http://flask.pocoo.org/docs/0.12/patterns/viewdecorators/
-from functools import wraps
-
-def farm_login_required(f):
+def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        dest = request.path[1:]  # Strip first '/' for convenience, and aesthetics
         username = request.get_cookie('username', '')
+        if not username:
+            redirect('/beta1810/login?next=%s' % dest)
+
         role = request.get_cookie('role', '')
-        if username and role == 'admin':
-            flash_message("Redirected. Do not have permission to edit farm profile.")
-            redirect('/beta1810/home')
-        if not username or role != 'editor':
-            # TODO: check farm profile also - for now only have one farm
-            redirect('/beta1810/login')
+        farmname = 'all' if (role == 'admin') else request.get_cookie('farmname', '')
+        dest_parts = dest.split('/')
+
+        if dest_parts[0] == 'edit':
+            # E.g. I.e. '/edit/dublin', either 'GET' or 'POST'
+            if farmname != 'all' and farmname != dest_parts[1]:
+                flash_message("Redirected. Do not have permission to edit farm profile %s" % dest_parts[1])
+                redirect('/beta1810/farms')
+
+        elif dest_parts[0] == 'admin':
+            # I.e. '/admin'
+            if role != admin:
+                flash_message("Redirected. Do not have admin permission")
+                redirect('/beta1810/farms')
+
         return f(*args, **kwargs)
     return decorated_function
 #
 
-def admin_login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        username = request.get_cookie('username', '')
-        role = request.get_cookie('role', '')
-        if username and role == 'editor':
-            flash_message("Redirected. Do not have access to admin page.")
-            redirect('/beta1810/home')
-        if not username or role != 'admin':
-            redirect('/beta1810/login')
-        return f(*args, **kwargs)
-    return decorated_function
-#
-
-def get_new_farm_content():
-    return OrderedDict([
-        ("title", ""),
-        ("images", []),
-        ("description", []),
-        ("info", OrderedDict([
-            ("Website", ""),
-            ("Email", ""),
-            ("Address", []),
-            ("Farmers", [])
-        ])),
-    ])
-#
-
-def get_farm_json_file(farmname):
-    return os.path.join(DATA_DIR, '%s.json' % farmname)
-#
-
-def get_farm_content(farmname):
-    json_file = get_farm_json_file(farmname)
-    if os.path.isfile(json_file):
-        content = json.load(open(json_file, 'rb'))
-    else:
-        content = get_new_farm_content()
-    return content
-#
-
-def update_farm_content(farmname, content):
-    json_file = get_farm_json_file(farmname)
-    debug_msg("update_farm_content json_file is '%s'" % json_file)
-    json.dump(content, open(json_file, 'wb'))
-#
-
-@get('/editfarm')
-@farm_login_required
-def editfarm():
+@get('/edit/<farm>')
+@login_required
+def editfarm(farm):
     farmname = request.get_cookie('farmname')
     username = request.get_cookie('username')
     role = request.get_cookie('role')
@@ -345,14 +353,11 @@ def editfarm():
     return render_template('editfarm', farmname=farmname, username=username, role=role, content=content, instructions=instructions, data_layout=data_layout, format_instructions=format_instructions)
 #
 
-from HTMLParser import HTMLParser
-
-@post('/editfarm')
-@farm_login_required
-def editfarm_post():
+@post('/edit/<farm>')
+@login_required
+def editfarm_post(farm):
     # Retrieve data from form on the "editprofile" page.
     form = cgi.FieldStorage()
-    farmname = cgi.escape(form.getfirst('farmname', ''))
     form_keys = form.keys()
 
     # The layout of the "editprofile" page is constructed according to farm-data-layout.json, so
@@ -366,18 +371,15 @@ def editfarm_post():
     if type(images) != list:
         debug_msg("Warning: editfarm_post, IMAGES not a list")
         images = [images]
-    
+
     # First get existing images, not those from file inputs
     values = form.getlist("images$existing")
 
     for image in images:
         if image.filename:
             # Write image to file
-            debug_msg("filename is %s" % image.filename)
-            dest = os.path.join(IMAGES_DIR, 'uploads', farmname, os.path.basename(image.filename))
-            if os.path.isfile(dest):
-                debug_msg("Upload image already on disk: %s" % dest)
-            else:
+            dest = os.path.join(IMAGES_DIR, 'uploads', farm, os.path.basename(image.filename))
+            if not os.path.isfile(dest):
                 dest_dir = os.path.dirname(dest)
                 if not os.path.isdir(dest_dir):
                     os.makedirs(dest_dir)
@@ -389,7 +391,7 @@ def editfarm_post():
                         break
                     dest_file.write(packet)
                 dest_file.close()
-            
+
             # Add path
             rel_dest = os.path.relpath(dest, ROOT_DIR)
             values.append(rel_dest)
@@ -402,8 +404,6 @@ def editfarm_post():
     default_image_keys = [x for x in form_keys if x.startswith(default_image_token)]
     if default_image_keys:
         updated_content['default-image'] = default_image_keys[0][len(default_image_token):]
-    debug_msg("keys")
-    debug_msg(str(form_keys))
 
     for key in sorted(form_keys):
         # Some entries in the farm data contain nested data. E.g. under "info", the editor of the farm profile is 
@@ -411,7 +411,7 @@ def editfarm_post():
         # of multiple strings.
         key_tokens = key.split('$')
         main_key = key_tokens[0]
-        
+
         # The form may have some inputs not used here, e.g. inputs for adding new key-value pairs
         if main_key not in layout['order']:
             continue
@@ -433,12 +433,12 @@ def editfarm_post():
             # contain a list of strings
             updated_content[main_key] = values
 
-    update_farm_content(farmname, updated_content)
-    redirect('/beta1810/editfarm')
+    update_farm_content(farm, updated_content)
+    redirect('/beta1810/edit/%s' % farm)
 #
 
 @route('/admin')
-@admin_login_required
+@login_required
 def admin():
     global FARM_PERMISSIONS
     admins = []
@@ -455,16 +455,13 @@ def admin():
     return render_template('admin', admins=admins, editors=editors, farms=farms)
 #
 
-
-
-
-"""
-Provide images and static files (scripts, css) to the browser using bottle.static_file.
-
-References:
-* https://stackoverflow.com/questions/6978603/how-to-load-a-javascript-or-css-file-into-a-bottlepy-template
-* https://bottlepy.org/docs/dev/tutorial.html#tutorial-static-files
-"""
+#
+# Provide images and static files (scripts, css) to the browser using bottle.static_file.
+#
+# References:
+# * https://stackoverflow.com/questions/6978603/how-to-load-a-javascript-or-css-file-into-a-bottlepy-template
+# * https://bottlepy.org/docs/dev/tutorial.html#tutorial-static-files
+#
 
 @route('/images/<filepath:path>')
 def image(filepath):

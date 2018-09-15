@@ -10,7 +10,7 @@ var setup = function() {
         "Moy Farm.jpg",
         "Slug control, Dublin CSA.jpg",
         ];
-    addSlideImgs("images/slideshow/", slideFilenames, showCaptions=false);
+    addSlideImgs("{{root_rel_dir}}images/slideshow/", slideFilenames, showCaptions=false);
     setupSlideEvents();
 };
 

@@ -1,6 +1,6 @@
 {
 	"images": ["images/uploads/cloughjordan/cloughjordan-Biodynamic.jpg", "images/uploads/cloughjordan/cloughjordan-Farm_festival_at_coachhouse.jpg", "images/uploads/cloughjordan/cloughjordan-Spring_Growth.JPG"],
-    "default-image": "images/uploads/cloughjordan/cloughjordan-Biodynamic.jpg",
+	"default-image": "images/uploads/cloughjordan/cloughjordan-Biodynamic.jpg",
 	"info": {
 		"Website": ["cloughjordancommunityfarm.ie"],
 		"CSA pickup location": ["Cloughjordan Eco Village"],

@@ -63,8 +63,8 @@ function deleteInput(elm) {
 }
 
 $(function () {
+    // Add input, e.g. <textarea rows="8" name= "{key}">{item}</textarea>
     addInput = function (elm, inputName, type) {
-        // E.g. <textarea rows="8" name= "{key}">{item}</textarea>
         var parent = elm.parentNode;  // E.g. <div class="input-container">
         var newContainer = $('<div class="input-container"></div>');
         if (type == "textarea") {
@@ -87,7 +87,7 @@ $(document).ready(function(){
 });
 </script>
 
-<form method="post" enctype="multipart/form-data" action="editfarm">
+<form method="post" enctype="multipart/form-data" action="{{root_rel_dir}}edit/{{farmname}}">
     <!-- Including the farmname as a hidden input allows for error checking in the post function -->
     <input type="hidden" name="farmname" value="{{farmname}}">
 
@@ -178,7 +178,7 @@ $(document).ready(function(){
                             % if key == "images":
                                 % checked = "checked" if (content.get('default-image', '') == item) else ""
                                 <input type="text" name="{{key}}$existing" value="{{item}}" style="background-color:#e3ede9" readonly>
-                                <img src="{{item}}"/>
+                                <img src="{{root_rel_dir}}{{item}}"/>
                                 <div class="edit-farm-align-right">
                                     <span class="edit-farm-control-no-hover">Select as profile image<input type="checkbox" class="is-default-image" name="is-default-img-{{item}}" {{checked}}/></span>
                                 </div>
@@ -228,6 +228,6 @@ $(document).ready(function(){
 
     <div class="input-container">
         <input class="edit-farm-submit" type="submit" value="Update farm">
-        <input class="edit-farm-submit" type="submit" formmethod="GET" value="Cancel">
+        <span class="edit-farm-control" onclick="window.location.href = '{{root_rel_dir}}edit/{{farmname}}'">Cancel</span>
     </div>
 </form>

@@ -165,7 +165,7 @@ p.footnote {
 }
 
 .flash p {
-    padding-bottom: 0px;
+    padding: 3px;
     background-color: #cae7de;
 }
 

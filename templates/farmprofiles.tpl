@@ -57,7 +57,7 @@ This page profiles some CSA farms in Ireland. There are up to ten active CSA far
                         <span class="profile-info-value">
                         {{!value}}
                         % if subkey == "Rep":
-                            <a href="editfarm"><i title="Click to edit this farm profile" class="fa fa-edit"></i></a>
+                            <a href="edit/{{farmname}}"><i title="Click to edit this farm profile" class="fa fa-edit"></i></a>
                         % end
                         </span>
                     </p>

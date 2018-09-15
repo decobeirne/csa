@@ -1,0 +1,21 @@
+{
+	"farms": ["cloughjordan"],
+	"admins": ["roisin.niccoil", "declan.obeirne"],
+	"editors": ["pat.malone", "seamus.bradley"],
+	"hashed_passwords": {
+		"roisin.niccoil": "csa",
+		"declan.obeirne": "csa",
+		"pat.malone": "csa",
+		"seamus.bradley": "csa"
+	},
+	"password_salts": {
+		"roisin.niccoil": "salt",
+		"declan.obeirne": "salt",
+		"pat.malone": "salt",
+		"seamus.bradley": "salt"
+	},
+	"permissions": {
+		"pat.malone": "cloughjordan",
+		"seamus.bradley": "dublin"
+	}
+}
