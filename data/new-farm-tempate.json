@@ -2,14 +2,14 @@
 	"images": [],
 	"default-image": "",
 	"info": {
-		"Website": [""],
-		"CSA pickup location": [""],
-		"Farmers": [""],
-		"Rep": [""],
-		"Contact phone": [""],
-		"Address": [""],
-		"Email": [""]
+		"Website": ["-"],
+		"CSA pickup location": ["-"],
+		"Farmers": ["-"],
+		"Rep": ["-"],
+		"Contact phone": ["-"],
+		"Address": ["-"],
+		"Email": ["-"]
 	},
-	"description": [""],
+	"description": ["Description coming soon"],
 	"title": [""]
 }
