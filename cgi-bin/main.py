@@ -52,8 +52,8 @@ def resources():
     return sessionutils.render_template('resources')
 #
 
-@get('/farms')
-def farmprofiles():
+@get('/farms/<farm>')
+def farmprofile(farm):
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
 
     def fixup_url(url):
@@ -78,19 +78,32 @@ def farmprofiles():
         images = content.get('images', [])
         return "" if not images else (default if (default in images) else images[0])
 
-    permissions_dict = datautils.get_permissions_dict()
-    farms = permissions_dict['farms']
-    farm_content_dict = {}
-    for farmname in farms:
-        farm_content = datautils.get_farm_content(farmname)
-        farm_content_dict[farmname] = farm_content
+    farm_content = datautils.get_farm_content(farm)
 
     return sessionutils.render_template(
-        'farmprofiles',
-        farm_content_dict=farm_content_dict,
+        'farmprofile',
+        farm=farm,
+        farm_content=farm_content,
         fixup_url=fixup_url,
         order_info_keys=order_info_keys,
         get_profile_image=get_profile_image)
+#
+
+@get('/farms')
+def farmprofiles():
+    permissions_dict = datautils.get_permissions_dict()
+    titles = {}
+    for farmname in permissions_dict['farms']:
+        farm_content = datautils.get_farm_content(farmname)
+        titles[farmname] = farm_content['title'][0]
+
+    def get_farm_title(farmname):
+        return titles.get(farmname, farmname.capitalize())
+
+    return sessionutils.render_template(
+        'farmprofiles',
+        permissions_dict=permissions_dict,
+        get_farm_title=get_farm_title)
 #
 
 #
