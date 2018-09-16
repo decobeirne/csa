@@ -13,14 +13,14 @@
         "cloughjordan"
     ], 
     "hashed_passwords": {
-        "audrey.vallier": "84f9d62a0ef1838bb59e6ce05c951c9b", 
+        "audrey.vallier": "736601a8c59c5a66444d169485566013", 
         "declan.obeirne": "736601a8c59c5a66444d169485566013", 
         "pat.malone": "e8f5dd2e5b22a963d72c6f798d5a0019", 
         "roisin.niccoil": "323728038f02670cc2576b6f41e3800a", 
         "seamus.bradley": "5cd6c75f5687661699f6a1ad3fcd3ad2"
     }, 
     "password_salts": {
-        "audrey.vallier": "bd22e7f75a714a51bd08cfce747b4fc3", 
+        "audrey.vallier": "8b6837658aa24b6791289ac448e6fbb6", 
         "declan.obeirne": "8b6837658aa24b6791289ac448e6fbb6", 
         "pat.malone": "f59fd7e77f5b4f61b54da7f00dd1d08e", 
         "roisin.niccoil": "00df38ddb98f4e6e9f7166aeb2441a1a", 

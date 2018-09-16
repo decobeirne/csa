@@ -48,6 +48,8 @@
                                 <a href="{{root_rel_dir}}edit/{{farmname_cookie}}">Edit {{farmname_cookie}} profile</a>
                                 <br>
                             % end
+                            <a href="{{root_rel_dir}}resetpassword">Reset password</a>
+                            <br>
                             <a href="{{root_rel_dir}}logout">Logout</a>
                         </p>
                     </div>

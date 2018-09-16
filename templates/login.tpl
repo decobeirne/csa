@@ -5,5 +5,7 @@
     <input type="hidden" name="next" value="{{next}}">
     <p>username <input type="text" name="username"></p>
     <p>password <input type="password" name="password"></p>
-    <p><input type="submit" value="Submit"></p>
+    <div class="input-container">
+        <input type="submit" value="Submit">
+    </div>
 </form>
