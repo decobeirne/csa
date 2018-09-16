@@ -87,9 +87,9 @@ $(document).ready(function(){
 });
 </script>
 
-<form method="post" enctype="multipart/form-data" action="{{root_rel_dir}}edit/{{farmname}}">
+<form method="post" enctype="multipart/form-data" action="{{root_rel_dir}}edit/{{farm}}">
     <!-- Including the farmname as a hidden input allows for error checking in the post function -->
-    <input type="hidden" name="farmname" value="{{farmname}}">
+    <input type="hidden" name="farmname" value="{{farm}}">
 
     % keys = data_layout['order']
     % textarea_inputs = data_layout['textarea-inputs']
@@ -228,6 +228,6 @@ $(document).ready(function(){
 
     <div class="input-container">
         <input class="edit-farm-submit" type="submit" value="Update farm">
-        <span class="edit-farm-control" onclick="window.location.href = '{{root_rel_dir}}edit/{{farmname}}'">Cancel</span>
+        <span class="edit-farm-control" onclick="window.location.href = '{{root_rel_dir}}edit/{{farm}}'">Cancel</span>
     </div>
 </form>

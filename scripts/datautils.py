@@ -24,9 +24,11 @@ def get_farm_json_file(farmname):
     return os.path.join(DATA_DIR, '%s.json' % farmname)
 #
 
-def get_new_farm_content():
-    json_file = get_farm_json_file('new-farm')
-    return json.load(open(json_file, 'rb'))
+def get_new_farm_content(farmname):
+    json_file = get_farm_json_file('new-farm-template')
+    content = json.load(open(json_file, 'rb'))
+    content['title'] = [farmname.capitalize()]
+    return content
 #
 
 def get_farm_content(farmname):
@@ -34,14 +36,14 @@ def get_farm_content(farmname):
     if os.path.isfile(json_file):
         content = json.load(open(json_file, 'rb'))
     else:
-        content = get_new_farm_content()
+        content = get_new_farm_content(farmname)
     return content
 #
 
 def update_farm_content(farmname, content):
     json_file = get_farm_json_file(farmname)
     LOGGER.info("Updated farm content %s" % json_file)
-    json.dump(content, open(json_file, 'wb'))
+    json.dump(content, open(json_file, 'wb'), indent=4, sort_keys=True)
 #
 
 def get_permissions_dict():
@@ -50,13 +52,7 @@ def get_permissions_dict():
 
 def update_permissions_dict(permissions_dict):
     LOGGER.info("Updated permissions database")
-    json.dump(permissions_dict, open(os.path.join(DATA_DIR, 'permissions.json'), 'wb'))
-#
-
-def delete_user(user, role, permissions_dict):
-    permissions_dict[role].remove(user)
-    permissions_dict['hashed_passwords'].pop(user)
-    permissions_dict['password_salts'].pop(user)
+    json.dump(permissions_dict, open(os.path.join(DATA_DIR, 'permissions.json'), 'wb'), indent=4, sort_keys=True)
 #
 
 def _add_unique(entry, existing_list):
@@ -65,12 +61,31 @@ def _add_unique(entry, existing_list):
     return list(existing_set)
 #
 
+def delete_user(user, role, permissions_dict):
+    permissions_dict[role].remove(user)
+    permissions_dict['hashed_passwords'].pop(user)
+    permissions_dict['password_salts'].pop(user)
+#
+
 def add_user(user, role, permissions_dict):
     permissions_dict[role] = _add_unique(user, permissions_dict[role])
     salt = make_salt()
     hash = get_hash("csa", salt)
     permissions_dict['hashed_passwords'][user] = hash
     permissions_dict['password_salts'][user] = salt
+    if role == 'editor':
+        permissions_dict['permissions'][user] = ''
+#
+
+def delete_farm(farm, permissions_dict):
+    permissions_dict['farms'].remove(farm)
+    for editor in permissions_dict['permissions']:
+        if permissions_dict['permissions'][editor] == farm:
+            permissions_dict['permissions'][editor] = ''
+#
+
+def add_farm(farm, permissions_dict):
+    permissions_dict['farms'] = _add_unique(farm, permissions_dict['farms'])
 #
 
 def make_salt():

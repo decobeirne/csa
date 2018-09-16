@@ -36,16 +36,16 @@
                     % end
                 </div>
                 
-                % if username:
+                % if username_cookie:
                     <div class="admin-info-container">
                         <p>
-                            Signed in as user <b>{{username}}</b>, with role <b>{{role}}</b>
+                            Signed in as user <b>{{username_cookie}}</b>, with role <b>{{role_cookie}}</b>
                             <br>
-                            % if role == 'admin':
+                            % if role_cookie == 'admin':
                                 <a href="{{root_rel_dir}}admin">Admin page</a>
                                 <br>
-                            % elif role == 'editor' and farmname:
-                                <a href="{{root_rel_dir}}edit/{{farmname}}">Edit {{farmname}} profile</a>
+                            % elif role_cookie == 'editor' and farmname_cookie:
+                                <a href="{{root_rel_dir}}edit/{{farmname_cookie}}">Edit {{farmname_cookie}} profile</a>
                                 <br>
                             % end
                             <a href="{{root_rel_dir}}logout">Logout</a>

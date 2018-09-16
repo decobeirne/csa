@@ -27,27 +27,6 @@ import datautils
 import sessionutils
 
 
-
-#
-
-#
-# Utility functions
-#
-
-def debug_msg(msg):  # TODO: delete / replace with logging
-    cwd = os.getcwd()
-    try:
-        os.chdir(TMP_DIR)
-        fd = open("debug.txt", "a")
-        fd.write(msg)
-        fd.write("\n")
-        fd.close()
-    finally:
-        os.chdir(cwd)
-#
-
-
-
 #
 # Regular pages
 #
@@ -75,14 +54,6 @@ def resources():
 
 @get('/farms')
 def farmprofiles():
-
-    # for i in range(0,4):
-        # salt = get_salt()
-        # hash = get_hash("csa", salt)
-        # debug_msg("%s, %s" % (hash, salt))
-        # debug_msg("%s, %s" % (type(hash), type(salt)))
-    
-
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
 
     def fixup_url(url):
@@ -235,7 +206,13 @@ def editfarm(farm):
     def format_instructions(instructions):
         return '<br>'.join("<i class='fa fa-info-circle'></i> %s" % x for x in instructions)
 
-    return sessionutils.render_template('editfarm', farmname=farm, username=username, role=role, content=content, instructions=instructions, data_layout=data_layout, format_instructions=format_instructions)
+    return sessionutils.render_template(
+        'editfarm',
+        farm=farm,
+        content=content,
+        instructions=instructions,
+        data_layout=data_layout,
+        format_instructions=format_instructions)
 #
 
 @post('/edit/<farm>')
@@ -254,7 +231,7 @@ def editfarm_post(farm):
     # Deal with images on their own before going through other items
     images = form["images"] if ("images" in form) else []
     if type(images) != list:
-        debug_msg("Warning: editfarm_post, IMAGES not a list")
+        LOGGER.warn("editfarm_post, IMAGES not a list")
         images = [images]
 
     # First get existing images, not those from file inputs
@@ -268,7 +245,7 @@ def editfarm_post(farm):
                 dest_dir = os.path.dirname(dest)
                 if not os.path.isdir(dest_dir):
                     os.makedirs(dest_dir)
-                debug_msg("Uploading to %s" % dest)
+                LOGGER.info("Uploading image to %s" % dest)
                 dest_file = open(dest, 'wb', 1000)
                 while True:
                     packet = image.file.read(1000)
@@ -319,6 +296,7 @@ def editfarm_post(farm):
             updated_content[main_key] = values
 
     datautils.update_farm_content(farm, updated_content)
+    sessionutils.flash_message("Farm profile <b>%s</b> updated" % farm)
     redirect('/beta1810/edit/%s' % farm)
 #
 
@@ -326,7 +304,17 @@ def editfarm_post(farm):
 @login_required
 def admin():
     permissions_dict = datautils.get_permissions_dict()
-    return sessionutils.render_template('admin', permissions_dict=permissions_dict)
+    farms = ['None'] + permissions_dict['farms']
+
+    def get_selected_farm(editor):
+        associated = permissions_dict['permissions'].get(editor, '')
+        associate = 'None' if associated == '' else associated
+        return [('selected' if x == associated else '', x) for x in farms]
+
+    return sessionutils.render_template(
+        'admin',
+        permissions_dict=permissions_dict,
+        get_selected_farm=get_selected_farm)
 #
 
 @post('/admin')
@@ -362,6 +350,29 @@ def admin():
     for new_editor in new_editors:
         LOGGER.info("Adding editor '%s'" % new_editor)
         datautils.add_user(new_editor, 'editors', permissions_dict)
+
+    # Permissions
+    existing_permissions = permissions_dict['permissions'].keys()
+    for editor in existing_permissions:
+        if editor not in permissions_dict['editors']:
+            permissions_dict['permissions'].pop(editor)
+    permission_keys = [x for x in form_keys if x.startswith('permission$')]
+    for permission_key in permission_keys:
+        editor = permission_key.split('$')[1]
+        permission = form.getlist(permission_key)[0]
+        permissions_dict['permissions'][editor] = '' if permission == 'None' else permission
+
+    # Farms
+    existing_farms = form.getlist("farm$existing")
+    farms_to_remove = [x for x in permissions_dict['farms'] if x not in existing_farms]
+    for farm_to_remove in farms_to_remove:
+        LOGGER.info("Removing farm '%s'" % farm_to_remove)
+        datautils.delete_farm(farm_to_remove, permissions_dict)
+
+    new_farms = [x for x in form.getlist("farm$new") if x != '']
+    for new_farm in new_farms:
+        LOGGER.info("Adding farm '%s'" % new_farm)
+        datautils.add_farm(new_farm, permissions_dict)
 
     datautils.update_permissions_dict(permissions_dict)
     redirect('/beta1810/admin')

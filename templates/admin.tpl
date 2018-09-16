@@ -38,6 +38,9 @@ $(function () {
 
     <div class="edit-farm-container">
         <p class="edit-farm-key">Admins</p>
+        <p class="edit-farm-instruction">
+            <i class="fa fa-info-circle"></i> An admin can edit any farm profile.
+        </p>
         % for admin in permissions_dict['admins']:
             <div class="input-container">
                 <input type="text" name="admin$existing" value="{{admin}}" style="background-color:#e3ede9" readonly>
@@ -53,11 +56,23 @@ $(function () {
 
     <div class="edit-farm-container">
         <p class="edit-farm-key">Editors</p>
+        <p class="edit-farm-instruction">
+            <i class="fa fa-info-circle"></i> An editor can have edit permission for zero (select <b>None</b>) or one farm.
+        </p>
         % for editor in permissions_dict['editors']:
             <div class="input-container">
                 <input type="text" name="editor$existing" value="{{editor}}" style="background-color:#e3ede9" readonly>
                 <div class="edit-farm-align-right">
                     <span class="edit-farm-control" onclick="deleteEntry(this)">Delete</span>
+                </div>
+                <div class="edit-farm-align-right">
+                    <span class="edit-farm-control-no-hover">Farm edit permissions
+                        <select name="permission${{editor}}">
+                            % for is_selected, farm in get_selected_farm(editor):
+                                <option {{is_selected}}>{{farm}}</option>
+                            % end
+                        </select>
+                    </span>
                 </div>
             </div>
         % end
@@ -69,9 +84,9 @@ $(function () {
     <div class="edit-farm-container">
         <p class="edit-farm-key">Farms</p>
         <p class="edit-farm-instruction">
-            <i class="fa fa-info-circle"></i> If adding a new farm, it should be given a simple, unique ID, i.e. lowercase with no punctuation or spaces. This is not displayed on the website, only used internally.
+            <i class="fa fa-info-circle"></i> If adding a new farm, it should be given a simple unique ID, e.g. lowercase with no punctuation or spaces.
             <br>
-            <i class="fa fa-info-circle"></i> Note that ID is not the title, which should be a human-readable string, and can be set on the <b>edit</b> page.
+            <i class="fa fa-info-circle"></i> Note that the ID is not the title, which can be set on the <b>edit</b> page.
             <br>
             <i class="fa fa-info-circle"></i> WARNING: deleting a farm will delete all content from the server.
         </p>

@@ -76,17 +76,17 @@ def render_template(name, **kwargs):
     try:
         os.chdir(TPL_DIR)
         tpl = bottle.SimpleTemplate(source=open(name + '.tpl').read())
-        username = bottle.request.get_cookie('username')
-        role = bottle.request.get_cookie('role')
-        farmname = bottle.request.get_cookie('farmname')
+        username_cookie = bottle.request.get_cookie('username')
+        role_cookie = bottle.request.get_cookie('role')
+        farmname_cookie = bottle.request.get_cookie('farmname')
         root_rel_dir = '../' * (bottle.request.path.count('/') - 1) # E.g. '/foo' == 0 == '', '/foo/bar' == 1 == '../'
         kwargs.update(
             {'page_name': name,
              'links': LINKS,
              'messages_to_flash': get_flash_messages(),  # Retrieve and wipe flash messages
-             'username': username,
-             'role': role,
-             'farmname': farmname,
+             'username_cookie': username_cookie,
+             'role_cookie': role_cookie,
+             'farmname_cookie': farmname_cookie,
              'root_rel_dir': root_rel_dir})
         return tpl.render(**kwargs)
     finally:
