@@ -48,6 +48,31 @@ def get_permissions_dict():
     return json.load(open(os.path.join(DATA_DIR, 'permissions.json'), 'rb'))
 #
 
+def update_permissions_dict(permissions_dict):
+    LOGGER.info("Updated permissions database")
+    json.dump(permissions_dict, open(os.path.join(DATA_DIR, 'permissions.json'), 'wb'))
+#
+
+def delete_user(user, role, permissions_dict):
+    permissions_dict[role].remove(user)
+    permissions_dict['hashed_passwords'].pop(user)
+    permissions_dict['password_salts'].pop(user)
+#
+
+def _add_unique(entry, existing_list):
+    existing_set = set(existing_list)
+    existing_set.add(entry)
+    return list(existing_set)
+#
+
+def add_user(user, role, permissions_dict):
+    permissions_dict[role] = _add_unique(user, permissions_dict[role])
+    salt = make_salt()
+    hash = get_hash("csa", salt)
+    permissions_dict['hashed_passwords'][user] = hash
+    permissions_dict['password_salts'][user] = salt
+#
+
 def make_salt():
     return uuid.uuid4().hex
 #

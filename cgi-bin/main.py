@@ -198,19 +198,19 @@ def login_required(f):
             redirect('/beta1810/login?next=%s' % dest)
 
         role = request.get_cookie('role', '')
-        farmname = 'all' if (role == 'admin') else request.get_cookie('farmname', '')
+        farm_cookie = 'all' if (role == 'admin') else request.get_cookie('farmname', '')
         dest_parts = dest.split('/')
 
         if dest_parts[0] == 'edit':
             # E.g. I.e. '/edit/dublin', either 'GET' or 'POST'
-            if farmname != 'all' and farmname != dest_parts[1]:
+            if farm_cookie != 'all' and farm_cookie != dest_parts[1]:
                 sessionutils.flash_message("Redirected. Do not have permission to edit farm profile %s" % dest_parts[1])
-                LOGGER.info("User '%s' with farm permission '%s' denied access to '/edit/%s', redirected" % (username, farmname, dest_parts[1]))
+                LOGGER.info("User '%s' with farm permission '%s' denied access to '/edit/%s', redirected" % (username, farm_cookie, dest_parts[1]))
                 redirect('/beta1810/farms')
 
         elif dest_parts[0] == 'admin':
             # I.e. '/admin'
-            if role != admin:
+            if role != 'admin':
                 sessionutils.flash_message("Redirected. Do not have admin permission")
                 LOGGER.info("User '%s' with role '%s' denied access to '/admin', redirected" % (username, role))
                 redirect('/beta1810/farms')
@@ -226,23 +226,22 @@ def login_required(f):
 @get('/edit/<farm>')
 @login_required
 def editfarm(farm):
-    farmname = request.get_cookie('farmname')
     username = request.get_cookie('username')
     role = request.get_cookie('role')
-    content = datautils.get_farm_content(farmname)
+    content = datautils.get_farm_content(farm)
     instructions = json.load(open(os.path.join(DATA_DIR, 'farm-data-instructions.json'), 'rb'))
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
 
     def format_instructions(instructions):
         return '<br>'.join("<i class='fa fa-info-circle'></i> %s" % x for x in instructions)
 
-    return sessionutils.render_template('editfarm', farmname=farmname, username=username, role=role, content=content, instructions=instructions, data_layout=data_layout, format_instructions=format_instructions)
+    return sessionutils.render_template('editfarm', farmname=farm, username=username, role=role, content=content, instructions=instructions, data_layout=data_layout, format_instructions=format_instructions)
 #
 
 @post('/edit/<farm>')
 @login_required
 def editfarm_post(farm):
-    # Retrieve data from form on the "editprofile" page.
+    # Retrieve data from the submitted form
     form = cgi.FieldStorage()
     form_keys = form.keys()
 
@@ -323,23 +322,49 @@ def editfarm_post(farm):
     redirect('/beta1810/edit/%s' % farm)
 #
 
-@route('/admin')
+@get('/admin')
 @login_required
 def admin():
-    return "hello"
-    # global FARM_PERMISSIONS
-    # admins = []
-    # editors = {}  # Map user to farm
-    # farms = []
-    # for username in FARM_PERMISSIONS:
-        # data = FARM_PERMISSIONS[username]
-        # if data['role'] == 'admin':
-            # admins.append(username)
-        # elif data['role'] == 'editor':
-            # editors[username] = data['farmname']
-            # farms.append(data['farmname'])
-    # farms = list(set(farms))  # Remove duplicates
-    # return sessionutils.render_template('admin', admins=admins, editors=editors, farms=farms)
+    permissions_dict = datautils.get_permissions_dict()
+    return sessionutils.render_template('admin', permissions_dict=permissions_dict)
+#
+
+@post('/admin')
+@login_required
+def admin():
+    # Retrieve data from the submitted form
+    form = cgi.FieldStorage()
+    form_keys = form.keys()
+
+    # Get current database
+    permissions_dict = datautils.get_permissions_dict()
+
+    # Admins
+    existing_admins = form.getlist("admin$existing")
+    admins_to_remove = [x for x in permissions_dict['admins'] if x not in existing_admins]
+    for admin_to_remove in admins_to_remove:
+        LOGGER.info("Removing admin '%s'" % admin_to_remove)
+        datautils.delete_user(admin_to_remove, 'admins', permissions_dict)
+
+    new_admins = [x for x in form.getlist("admin$new") if x != '']
+    for new_admin in new_admins:
+        LOGGER.info("Adding admin '%s'" % new_admin)
+        datautils.add_user(new_admin, 'admins', permissions_dict)
+
+    # Editors
+    existing_editors = form.getlist("editor$existing")
+    editors_to_remove = [x for x in permissions_dict['editors'] if x not in existing_editors]
+    for editor_to_remove in editors_to_remove:
+        LOGGER.info("Removing editor '%s'" % editor_to_remove)
+        datautils.delete_user(editor_to_remove, 'editors', permissions_dict)
+
+    new_editors = [x for x in form.getlist("editor$new") if x != '']
+    for new_editor in new_editors:
+        LOGGER.info("Adding editor '%s'" % new_editor)
+        datautils.add_user(new_editor, 'editors', permissions_dict)
+
+    datautils.update_permissions_dict(permissions_dict)
+    redirect('/beta1810/admin')
 #
 
 #
