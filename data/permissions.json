@@ -3,16 +3,16 @@
 	"admins": ["roisin.niccoil", "declan.obeirne"],
 	"editors": ["pat.malone", "seamus.bradley"],
 	"hashed_passwords": {
-		"roisin.niccoil": "csa",
-		"declan.obeirne": "csa",
-		"pat.malone": "csa",
-		"seamus.bradley": "csa"
+		"roisin.niccoil": "323728038f02670cc2576b6f41e3800a",
+		"declan.obeirne": "4af08d98eb09b051de60d5becacee38f",
+		"pat.malone": "e8f5dd2e5b22a963d72c6f798d5a0019",
+		"seamus.bradley": "5cd6c75f5687661699f6a1ad3fcd3ad2"
 	},
 	"password_salts": {
-		"roisin.niccoil": "salt",
-		"declan.obeirne": "salt",
-		"pat.malone": "salt",
-		"seamus.bradley": "salt"
+		"roisin.niccoil": "00df38ddb98f4e6e9f7166aeb2441a1a",
+		"declan.obeirne": "6a6b471e76174de0ba031e2bd854561d",
+		"pat.malone": "f59fd7e77f5b4f61b54da7f00dd1d08e",
+		"seamus.bradley": "e79d824586ac4c928679138512a17814"
 	},
 	"permissions": {
 		"pat.malone": "cloughjordan",
