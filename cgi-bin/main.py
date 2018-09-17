@@ -129,7 +129,7 @@ def login_post():
         (role, assigned_farm) = datautils.get_permissions(username)
         now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         sessionutils.flash_message("Signed in user <b>%s</b> on %s" % (username, now))
-        LOGGER.info("Signed in user '%s' with role '%s' and permissions for farm '%s'" % (username, role, assigned_farm))
+        LOGGER.info("Signed in user [%s] with role [%s] and permissions for farm [%s]" % (username, role, assigned_farm))
 
         # Record in session
         sessionutils.setup_session(username, role, assigned_farm)
@@ -138,7 +138,7 @@ def login_post():
         if role == 'admin':
             # E.g. '/admin' or '/edit/dublin'
             # Admins have access to edit any farm profile, so not necessary to check.
-            LOGGER.info("User '%s' signed in as admin, redirecting to '%s'" % (username, nextpage))
+            LOGGER.info("User [%s] signed in as admin redirecting to [%s]" % (username, nextpage))
             redirect('/beta1810/%s' % nextpage)
         else:
             next_parts = nextpage.split('/')
@@ -146,18 +146,18 @@ def login_post():
             # the requested page
             if len(next_parts) == 2 and next_parts[0] == 'edit':
                 if next_parts[1] == assigned_farm:
-                    LOGGER.info("User '%s' signed in, access granted to '%s'" % (username, nextpage))
+                    LOGGER.info("User [%s] signed in and access granted to [%s]" % (username, nextpage))
                     redirect('/beta1810/%s' % nextpage)
                 else:
                     sessionutils.flash_message("Redirected. No access to requested page")
-                    LOGGER.info("User '%s' signed in, requested access to '%s', which doesn't match user's farm '%s', so redirecting" % (username, nextpage, assigned_farm))
+                    LOGGER.info("User [%s] signed in but requested access to [%s] which doesn't match user's farm [%s] so redirecting" % (username, nextpage, assigned_farm))
                     redirect('/beta1810/home')
             else:
-                LOGGER.info("User '%s' signed in, didn't request '/edit/<some farm>', so redirecting to home" % username)
+                LOGGER.info("User [%s] signed in but didn't request [/edit/<some farm>] so redirecting to home" % username)
                 redirect('/beta1810/home')
     else:
         sessionutils.flash_message("Sign in for user <b>%s</b> failed. Please contact admin to check your permissions." % username)
-        LOGGER.info("Sign in failed for user '%s'" % username)
+        LOGGER.info("Sign in failed for user [%s]" % username)
         return sessionutils.render_template("login")
 #
 
@@ -178,7 +178,7 @@ def login_required(f):
         dest = request.path[1:]  # Strip first '/' for convenience, and aesthetics
         username = request.get_cookie('username', '')
         if not username:
-            LOGGER.info("User '%s' redirected to login, as not in session" % username)
+            LOGGER.info("User [%s] redirected to [/login], as not in session" % username)
             redirect('/beta1810/login?nextpage=%s' % dest)
 
         role = request.get_cookie('role', '')
@@ -189,14 +189,14 @@ def login_required(f):
             # E.g. I.e. '/edit/dublin', either 'GET' or 'POST'
             if farm_cookie != 'all' and farm_cookie != dest_parts[1]:
                 sessionutils.flash_message("Redirected. Do not have permission to edit farm profile %s" % dest_parts[1])
-                LOGGER.info("User '%s' with farm permission '%s' denied access to '/edit/%s', redirected" % (username, farm_cookie, dest_parts[1]))
+                LOGGER.info("User [%s] with farm permission [%s] denied access to [/edit/%s] so redirected" % (username, farm_cookie, dest_parts[1]))
                 redirect('/beta1810/farms')
 
         elif dest_parts[0] == 'admin':
             # I.e. '/admin'
             if role != 'admin':
                 sessionutils.flash_message("Redirected. Do not have admin permission")
-                LOGGER.info("User '%s' with role '%s' denied access to '/admin', redirected" % (username, role))
+                LOGGER.info("User [%s] with role [%s] denied access to [/admin] so redirected" % (username, role))
                 redirect('/beta1810/farms')
 
         return f(*args, **kwargs)
@@ -267,7 +267,6 @@ def editfarm_post(farm):
     # Deal with images on their own before going through other items
     images = form["images"] if ("images" in form) else []
     if type(images) != list:
-        LOGGER.warn("editfarm_post, IMAGES not a list")
         images = [images]
 
     # First get existing images, not those from file inputs
@@ -275,24 +274,9 @@ def editfarm_post(farm):
 
     for image in images:
         if image.filename:
-            # Write image to file
-            dest = os.path.join(IMAGES_DIR, 'uploads', farm, os.path.basename(image.filename))
-            if not os.path.isfile(dest):
-                dest_dir = os.path.dirname(dest)
-                if not os.path.isdir(dest_dir):
-                    os.makedirs(dest_dir)
-                LOGGER.info("Uploading image to %s" % dest)
-                dest_file = open(dest, 'wb', 1000)
-                while True:
-                    packet = image.file.read(1000)
-                    if not packet:
-                        break
-                    dest_file.write(packet)
-                dest_file.close()
-
-            # Add path
-            rel_dest = os.path.relpath(dest, ROOT_DIR)
-            values.append(rel_dest)
+            image_path = datautils.save_img(farm, image)
+            rel_path = os.path.relpath(image_path, ROOT_DIR)
+            values.append(rel_path)
 
     # Add image paths to dict
     updated_content["images"] = values
@@ -331,6 +315,7 @@ def editfarm_post(farm):
             # contain a list of strings
             updated_content[main_key] = values
 
+    datautils.delete_removed_imgs(farm, updated_content)
     datautils.update_farm_content(farm, updated_content)
     sessionutils.flash_message("Farm profile <b>%s</b> updated" % farm)
     redirect('/beta1810/edit/%s' % farm)
@@ -367,25 +352,25 @@ def admin():
     existing_admins = form.getlist("admin$existing")
     admins_to_remove = [x for x in permissions_dict['admins'] if x not in existing_admins]
     for admin_to_remove in admins_to_remove:
-        LOGGER.info("Removing admin '%s'" % admin_to_remove)
         datautils.delete_user(admin_to_remove, 'admins', permissions_dict)
+        LOGGER.info("Removed admin [%s]" % admin_to_remove)
 
     new_admins = [x for x in form.getlist("admin$new") if x != '']
     for new_admin in new_admins:
-        LOGGER.info("Adding admin '%s'" % new_admin)
         datautils.add_user(new_admin, 'admins', permissions_dict)
+        LOGGER.info("Added admin [%s]" % new_admin)
 
     # Editors
     existing_editors = form.getlist("editor$existing")
     editors_to_remove = [x for x in permissions_dict['editors'] if x not in existing_editors]
     for editor_to_remove in editors_to_remove:
-        LOGGER.info("Removing editor '%s'" % editor_to_remove)
         datautils.delete_user(editor_to_remove, 'editors', permissions_dict)
+        LOGGER.info("Removed editor [%s]" % editor_to_remove)
 
     new_editors = [x for x in form.getlist("editor$new") if x != '']
     for new_editor in new_editors:
-        LOGGER.info("Adding editor '%s'" % new_editor)
         datautils.add_user(new_editor, 'editors', permissions_dict)
+        LOGGER.info("Added editor [%s]" % new_editor)
 
     # Permissions
     existing_permissions = permissions_dict['permissions'].keys()
@@ -402,13 +387,13 @@ def admin():
     existing_farms = form.getlist("farm$existing")
     farms_to_remove = [x for x in permissions_dict['farms'] if x not in existing_farms]
     for farm_to_remove in farms_to_remove:
-        LOGGER.info("Removing farm '%s'" % farm_to_remove)
         datautils.delete_farm(farm_to_remove, permissions_dict)
+        LOGGER.info("Removed farm [%s]" % farm_to_remove)
 
     new_farms = [x for x in form.getlist("farm$new") if x != '']
     for new_farm in new_farms:
-        LOGGER.info("Adding farm '%s'" % new_farm)
         datautils.add_farm(new_farm, permissions_dict)
+        LOGGER.info("Added farm [%s]" % new_farm)
 
     datautils.update_permissions_dict(permissions_dict)
     redirect('/beta1810/admin')

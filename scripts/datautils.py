@@ -5,7 +5,9 @@ import os
 import uuid
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, os.pardir, 'data'))
+ROOT_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, os.pardir))
+DATA_DIR = os.path.join(ROOT_DIR, 'data')
+IMAGES_DIR = os.path.join(ROOT_DIR, 'images')
 
 LOGGER = logging.getLogger("csa.datautils")
 
@@ -42,8 +44,41 @@ def get_farm_content(farmname):
 
 def update_farm_content(farmname, content):
     json_file = get_farm_json_file(farmname)
-    LOGGER.info("Updated farm content %s" % json_file)
+    LOGGER.info("Updated farm content [%s]" % json_file)
     json.dump(content, open(json_file, 'wb'), indent=4, sort_keys=True)
+#
+
+def get_imgs_dir(farmname):
+    return os.path.join(IMAGES_DIR, 'uploads', farmname)
+#
+
+def save_img(farmname, image):
+    imgs_dir = get_imgs_dir(farmname)
+    dest_path = os.path.join(imgs_dir, os.path.basename(image.filename))
+    if not os.path.isfile(dest_path):
+        if not os.path.isdir(imgs_dir):
+            os.makedirs(imgs_dir)
+        LOGGER.info("Uploading image to [%s]" % dest_path)
+        dest_file = open(dest_path, 'wb', 1000)
+        while True:
+            packet = image.file.read(1000)
+            if not packet:
+                break
+            dest_file.write(packet)
+        dest_file.close()
+    return dest_path
+#
+
+def delete_removed_imgs(farmname, updated_content):
+    previous_content = get_farm_content(farmname)
+    imgs_to_remove = [x for x in previous_content['images'] if x not in updated_content['images']]
+    for img in imgs_to_remove:
+        abs_path = os.path.join(ROOT_DIR, img)
+        if os.path.isfile(abs_path):
+            os.remove(abs_path)
+            LOGGER.info("Deleted img removed from farm profile [%s]" % abs_path)
+        else:
+            LOGGER.info("Removed img [%s] not on disk so did not not" % img)
 #
 
 def get_permissions_dict():
@@ -82,6 +117,15 @@ def delete_farm(farm, permissions_dict):
     for editor in permissions_dict['permissions']:
         if permissions_dict['permissions'][editor] == farm:
             permissions_dict['permissions'][editor] = ''
+    imgs_dir = get_imgs_dir(farm)
+    # shutil.rmtree(imgs_dir)
+    LOGGER.critical("Deleted imgs dir [%s] for farm [%s]" % (imgs_dir, farm))
+    json_file = get_farm_json_file(farm)
+    if os.path.isfile(json_file):
+        # os.remove(json_file)
+        LOGGER.critical("Deleted dict [%s] for farm [%s]" % (json_file, farm))
+    else:
+        LOGGER.info("Dict [%s] for farm [%s] not on disk so did not delete" % (json_file, farm))
 #
 
 def add_farm(farm, permissions_dict):
@@ -114,9 +158,9 @@ def check_password(username, password):
             if hash == permissions_dict['hashed_passwords'][username]:
                 return True
             else:
-                LOGGER.debug("User '%s' hash mismatch '%s'!='%s'" % (username, hash, permissions_dict['hashed_passwords'][username]))
+                LOGGER.debug("User [%s] hash mismatch [%s]!=[%s]" % (username, hash, permissions_dict['hashed_passwords'][username]))
         else:
-            LOGGER.debug("User '%s' not in db" % username)
+            LOGGER.debug("User [%s] not in db" % username)
     return False
 #
 
