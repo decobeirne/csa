@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+import shutil
 import uuid
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -118,11 +119,11 @@ def delete_farm(farm, permissions_dict):
         if permissions_dict['permissions'][editor] == farm:
             permissions_dict['permissions'][editor] = ''
     imgs_dir = get_imgs_dir(farm)
-    # shutil.rmtree(imgs_dir)
+    shutil.rmtree(imgs_dir)
     LOGGER.critical("Deleted imgs dir [%s] for farm [%s]" % (imgs_dir, farm))
     json_file = get_farm_json_file(farm)
     if os.path.isfile(json_file):
-        # os.remove(json_file)
+        os.remove(json_file)
         LOGGER.critical("Deleted dict [%s] for farm [%s]" % (json_file, farm))
     else:
         LOGGER.info("Dict [%s] for farm [%s] not on disk so did not delete" % (json_file, farm))
