@@ -1,66 +1,52 @@
 % rebase('base.tpl')
 
 <script>
-function addKeyValuePair(clickedElement, key) {
-    var paraParent = clickedElement.parentNode; // <p>
-    var newSubkeyInput = paraParent.firstElementChild;
-    var newSubkey = newSubkeyInput.value;
-    if (newSubkey == "") {
-        return;
-    }
-    
-    var topContainer = paraParent.parentNode; // <div class="edit-farm-container">
-    
-    var subkeyContainer = document.createElement("div");
-    subkeyContainer.classList.add("subkey-container");
-    
-    var subkeyPara = document.createElement("p");
-    subkeyPara.classList.add("edit-farm-sub-key");
-    
-    var subkeyTextNode = document.createTextNode(newSubkey);
-    subkeyPara.appendChild(subkeyTextNode);
-    
-    var controlsPara = document.createElement("p");
-    
-    var addInputId = key + '$' + newSubkey;
-    var addInputSpan = document.createElement("span");
-    addInputSpan.classList.add("edit-farm-control");
-    addInputSpan.onclick = function(){addInput(addInputSpan, addInputId, false)};
-    addInputSpan.innerHTML = "Add entry";
-    
-    var breakTextNode = document.createElement("br");
-    
-    var deleteKeyValuePairSpan = document.createElement("span");
-    deleteKeyValuePairSpan.classList.add("edit-farm-control");
-    deleteKeyValuePairSpan.onclick = function(){deleteKeyValuePair(deleteKeyValuePairSpan)};
-    deleteKeyValuePairSpan.innerHTML = "Delete this key-value pair";
-    
-    
-    controlsPara.appendChild(addInputSpan);
-    controlsPara.appendChild(breakTextNode);
-    controlsPara.appendChild(deleteKeyValuePairSpan);
-    
-    subkeyContainer.appendChild(subkeyPara);
-    subkeyContainer.appendChild(controlsPara);
-    
-    topContainer.insertBefore(subkeyContainer, paraParent);
-    
-    // Blank the input
-    newSubkeyInput.value = "";
-}
+$(function () {
+    addKeyValuePair = function (elm) {
+        var subKey = $(elm).val();
+        if (subKey == "") {
+            return;
+        }
+        
+        var key = $(elm).parent().parent().attr('id');
+        var newFullKey = key + '$' + subKey;
+        var newSubKeyContainer = $('<div class="subkey-container"></div>');
+        var newPara = $('<p class="edit-farm-sub-key">' + subKey + '</p>');
+        var newInputContainer = $('<div class="input-container"><input type="text" name="' + newFullKey + '" value=""><div class="edit-farm-align-right"><span class="edit-farm-control" onclick="deleteInput(this)">Delete entry</span></div>');
+        var newAddEntryPara = $('<p><span class="edit-farm-control" onclick="addInput(this, \'' + newFullKey + '\', \'input\')">Add entry</span><br><span class="edit-farm-control" onclick="deleteKeyValuePair(this)">Delete this key-value pair</span></p>');
+        newSubKeyContainer.append(newPara);
+        newSubKeyContainer.append(newInputContainer);
+        newSubKeyContainer.append(newAddEntryPara);
+        
+        var para = $(elm).parent();
+        var lastSubKey = para.prevAll('div.subkey-container:first');
+        newSubKeyContainer.insertAfter(lastSubKey);
+        
+        $(elm).val("");
+    };
+});
 
-function deleteKeyValuePair(clickedElement) {
-    var paraParent = clickedElement.parentNode; // <p>
-    var subKeyCont = paraParent.parentNode; // <div class="subkey-container">
-    subKeyCont.parentNode.removeChild(subKeyCont)
-}
+$(function () {
+    addKeyValuePairFromSpan = function (elm) {
+        var para = $(elm).parent().prev();
+        var input = para.children('input:first');
+        addKeyValuePair(input.get(0));
+    };
+});
 
-function deleteInput(elm) {
-    // No advantage to using jquery here
-    var inputContainer = elm.parentNode.parentNode;  // E.g. <div class="input-container"><div class="edit-farm-align-right">
-    var subkeyContainer = inputContainer.parentNode;  // E.g. <div class="subkey-container">, <div class="edit-farm-container">
-    subkeyContainer.removeChild(inputContainer);
-}
+$(function () {
+    deleteKeyValuePair = function (elm) {
+        var subKeyContainer = $(elm).parent().parent();  // E.g. <div class="subkey-container"><p>
+        subKeyContainer.remove();
+    };
+});
+
+$(function () {
+    deleteInput = function (elm) {
+        var inputContainer = $(elm).parent().parent();  // E.g. <div class="input-container"><div class="edit-farm-align-right">
+        inputContainer.remove();
+    };
+});
 
 $(function () {
     // Add input, e.g. <textarea rows="8" name= "{key}">{item}</textarea>
@@ -83,6 +69,15 @@ $(document).ready(function(){
     // If an image is selected as the profile image, unset any previously selected image
     $('form').on('click', '.is-default-image', function() {
         $('.is-default-image').not(this).prop('checked', false);
+    });
+    
+    // Make inputs for adding a new key-value pair clickable
+    $('.new-subkey').keypress(function (e) {
+        var key = e.which;
+        if(key == 13) {
+            addKeyValuePair(e.target);
+            return false;
+        }
     });
 });
 </script>
@@ -109,7 +104,7 @@ $(document).ready(function(){
         % value = content[key]
         <!-- Key "{{key}}" -->
 
-        <div class="edit-farm-container">
+        <div class="edit-farm-container" id="{{key}}">
             % title = key.capitalize()
             <p class="edit-farm-key">{{title}}</p>
             <p class="edit-farm-instruction">{{!instruction}}</p>
@@ -159,10 +154,10 @@ $(document).ready(function(){
                 </p>
                 <p>
                     <!-- Control to add new key-value pair -->
-                    <input type="text" name="new-subkey">
+                    <input type="text" class="new-subkey">
                 </p>
                 <p>
-                    <span class="edit-farm-control" onclick="addKeyValuePair(this, '{{key}}')">Add key-value pair</span>
+                    <span class="edit-farm-control" onclick="addKeyValuePairFromSpan(this)">Add key-value pair</span>
                 </p>
             
             <!-- End of key "{{key}}" with nested values -->

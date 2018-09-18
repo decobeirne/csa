@@ -21,7 +21,7 @@ $(function () {
 });
 
 $(function () {
-    deleteEntry = function (elm, type) {
+    deleteEntry = function (elm) {
         var inputContainer = $(elm).parent().parent();  // E.g. <div class="input-container"><div class="edit-farm-align-right">
         inputContainer.remove();
     };
