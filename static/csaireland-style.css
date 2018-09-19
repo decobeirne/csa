@@ -468,6 +468,16 @@ circle {
     opacity: 0.8;
 }
 
+.editfarm-coords-container {
+    width: 40%;
+}
+
+.editfarm-coords-svg-container {
+    position: relative;
+    border: 1px solid #c5e2d9;
+    margin: 15px;
+}
+
 
 /*
  *

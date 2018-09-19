@@ -79,6 +79,27 @@ $(document).ready(function(){
             return false;
         }
     });
+    
+    // TODO: this below didn't work, i.e. displaying a circle didn't work, and the offset worked for img, wasn't tested for svg/image
+    // TODO: copy functions from E:\Dropbox\Sandbox\CsaIrelandWebsite\Development20180316_uploading\farmprofiles-beta.html
+    // Update farm coordinates
+    $('.editfarm-coords-img').click(function (e) {
+        var offset = $(this).offset(); 
+        var relX = e.pageX - offset.left;
+        var relY = e.pageY - offset.top;
+        
+        // clientWidth is the width of the image on screen while naturalWidth is the width of the image file
+        //var barElem = $(this)[0];
+        var fracX = relX / this.clientWidth;
+        var fracY = relY / this.clientHeight;
+        
+        var circle = $('<circle cx="' + relX + '" cy="' + relY + '"/>');
+        $(this).parent().append(circle);
+        
+        var val = fracX + ',' + fracY
+        var input = $(this).parent().children('input:first');
+        input.val(val);
+    });
 });
 </script>
 
@@ -97,7 +118,29 @@ $(document).ready(function(){
     <p class="edit-farm-instruction">
         {{!top_instructions}}
     </p>
-    
+
+    <div class="edit-farm-container" id="coords">
+        <p class="edit-farm-key">Location</p>
+        % coords_instructions = format_instructions(instructions['coords'])
+        <p class="edit-farm-instruction">
+            {{!coords_instructions}}
+        </p>
+
+        <div class="editfarm-coords-container">
+            <div class="editfarm-coords-svg-container">
+                <!-- The dummy canvas is required to make resizing work on IE -->
+                <!-- These are the hard-coded dimensions of the SVG map we're using -->
+                <canvas class="dummy-canvas" width="253.38666" height="317.33331"></canvas>
+                <svg id="map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 253.38666 317.33331" preserveAspectRatio="xMaxYMax meet">
+                    <image id="map-img" width="253.38666" height="317.33331" xlink:href="{{root_rel_dir}}images/map/map-all-blank-no-dots-no-frame-fill.svg"></image>
+                </svg>
+            </div>
+
+            % coords = content.get('coords', 'None')
+            <input type="hidden" name="editfarm-coords-val" value="{{coords}}">
+        </div>
+    </div>
+
     <!-- Iterate through keys as listed in instruction dict -->
     % for key in keys:
         % instruction = format_instructions(instructions[key])
