@@ -286,7 +286,7 @@ def editfarm_post(farm):
     default_image_keys = [x for x in form_keys if x.startswith(default_image_token)]
     if default_image_keys:
         updated_content['default-image'] = default_image_keys[0][len(default_image_token):]
-
+    LOGGER.info("form keys %s" % str(form_keys))
     for key in sorted(form_keys):
         # Some entries in the farm data contain nested data. E.g. under "info", the editor of the farm profile is 
         # allowed to add or remove key-value pairs, e.g. "Pick up location", which could be an address consisting

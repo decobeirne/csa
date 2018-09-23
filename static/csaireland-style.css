@@ -397,12 +397,12 @@ input[type=checkbox] {
     margin: 0px 0px 0px 4px;
 }
 
-input {
-    box-sizing: border-box;
+input[type=submit] {
+    width: auto;
 }
 
-input.edit-farm-submit {
-    width: auto;
+input {
+    box-sizing: border-box;
 }
 
 textarea {
@@ -468,11 +468,11 @@ circle {
     opacity: 0.8;
 }
 
-.editfarm-coords-container {
+.edit-farm-coords-container {
     width: 40%;
 }
 
-.editfarm-coords-svg-container {
+.edit-farm-coords-svg-container {
     position: relative;
     border: 1px solid #c5e2d9;
     margin: 15px;

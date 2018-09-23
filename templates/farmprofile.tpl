@@ -23,7 +23,7 @@
             
             <!-- TODO: we could put "Representative" first if required -->
             % subkeys = order_info_keys(farm_content["info"].keys())
-            %for subkey in subkeys:
+            % for subkey in subkeys:
                 <%
                 # fixup_url should have been passed to render()
                 convert_to_a = lambda x: '<a href="%s">%s</a>' % (fixup_url(x), fixup_url(x))

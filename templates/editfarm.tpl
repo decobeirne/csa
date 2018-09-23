@@ -65,6 +65,19 @@ $(function () {
     };
 });
 
+$(function () {
+    addCircle = function (circleX, circleY) {
+        $('.map-circle').remove();
+
+        // Create the element using JavaScript, as not well supported by jQuery
+        // https://stackoverflow.com/questions/3642035/jquerys-append-not-working-with-svg-element
+        var circleElem = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        var circle = $(circleElem);
+        circle.addClass('map-circle').attr({id: 'map-circle-new', cx: circleX, cy: circleY, r: 3});
+        $('#edit-farm-map-svg').append(circle);
+    };
+});
+
 $(document).ready(function(){
     // If an image is selected as the profile image, unset any previously selected image
     $('form').on('click', '.is-default-image', function() {
@@ -79,27 +92,30 @@ $(document).ready(function(){
             return false;
         }
     });
-    
-    // TODO: this below didn't work, i.e. displaying a circle didn't work, and the offset worked for img, wasn't tested for svg/image
-    // TODO: copy functions from E:\Dropbox\Sandbox\CsaIrelandWebsite\Development20180316_uploading\farmprofiles-beta.html
-    // Update farm coordinates
-    $('.editfarm-coords-img').click(function (e) {
-        var offset = $(this).offset(); 
-        var relX = e.pageX - offset.left;
-        var relY = e.pageY - offset.top;
-        
-        // clientWidth is the width of the image on screen while naturalWidth is the width of the image file
-        //var barElem = $(this)[0];
-        var fracX = relX / this.clientWidth;
-        var fracY = relY / this.clientHeight;
-        
-        var circle = $('<circle cx="' + relX + '" cy="' + relY + '"/>');
-        $(this).parent().append(circle);
-        
-        var val = fracX + ',' + fracY
-        var input = $(this).parent().children('input:first');
-        input.val(val);
+
+    $('.edit-farm-coords-svg-container').click(function (e) {
+        // Recall that clientWidth is the width of the image on screen while naturalWidth is the width of the image file
+        // Use hard-coded bounds of actual map for drawing
+        var mapImg = $('#edit-farm-map-img');
+        var mapImgElem = mapImg[0];
+        var offset = mapImg.offset();
+        var evtRelX = e.pageX - offset.left;
+        var evtRelY = e.pageY - offset.top;
+        var canvas = $('.dummy-canvas');
+        var canvasElem = canvas[0];
+        var circleX = (evtRelX / canvasElem.clientWidth) * 253.38666;
+        var circleY = (evtRelY / canvasElem.clientHeight) * 317.33331;
+
+        var input = $('#editfarm-coords-container').children('input:first');
+        input.val(circleX + ',' + circleY);
+
+        addCircle(circleX, circleY);
     });
+    
+    % coords = content.get('coords', [''])[0].split(',')
+    % if len(coords) == 2:
+        addCircle({{coords[0]}}, {{coords[1]}});
+    % end
 });
 </script>
 
@@ -119,32 +135,10 @@ $(document).ready(function(){
         {{!top_instructions}}
     </p>
 
-    <div class="edit-farm-container" id="coords">
-        <p class="edit-farm-key">Location</p>
-        % coords_instructions = format_instructions(instructions['coords'])
-        <p class="edit-farm-instruction">
-            {{!coords_instructions}}
-        </p>
-
-        <div class="editfarm-coords-container">
-            <div class="editfarm-coords-svg-container">
-                <!-- The dummy canvas is required to make resizing work on IE -->
-                <!-- These are the hard-coded dimensions of the SVG map we're using -->
-                <canvas class="dummy-canvas" width="253.38666" height="317.33331"></canvas>
-                <svg id="map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 253.38666 317.33331" preserveAspectRatio="xMaxYMax meet">
-                    <image id="map-img" width="253.38666" height="317.33331" xlink:href="{{root_rel_dir}}images/map/map-all-blank-no-dots-no-frame-fill.svg"></image>
-                </svg>
-            </div>
-
-            % coords = content.get('coords', 'None')
-            <input type="hidden" name="editfarm-coords-val" value="{{coords}}">
-        </div>
-    </div>
-
     <!-- Iterate through keys as listed in instruction dict -->
     % for key in keys:
         % instruction = format_instructions(instructions[key])
-        % value = content[key]
+        % value = content.get(key, [])
         <!-- Key "{{key}}" -->
 
         <div class="edit-farm-container" id="{{key}}">
@@ -152,7 +146,23 @@ $(document).ready(function(){
             <p class="edit-farm-key">{{title}}</p>
             <p class="edit-farm-instruction">{{!instruction}}</p>
 
-            % if key in nested_inputs:
+            %if key == 'coords':
+            <!-- Special container for farm coords -->
+            <div class="edit-farm-coords-container" id="editfarm-coords-container">
+                <!-- These are the hard-coded dimensions of the SVG map we're using :( -->
+                <div class="edit-farm-coords-svg-container">
+                    <!-- The canvas is required to make resizing the SVG work on IE -->
+                    <canvas class="dummy-canvas" width="253.38666" height="317.33331"></canvas>
+                    <svg id="edit-farm-map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 253.38666 317.33331" preserveAspectRatio="xMaxYMax meet">
+                        <image id="edit-farm-map-img" width="253.38666" height="317.33331" xlink:href="{{root_rel_dir}}images/map/map-all-blank-no-dots-no-frame-fill.svg"></image>
+                    </svg>
+                </div>
+
+                % coords = content.get('coords', [''])[0]
+                <input type="hidden" name="coords" value="{{coords}}">
+            </div>
+            <!-- End of farm coords container -->
+            % elif key in nested_inputs:
             <!-- Key "{{key}}" contains nested values, e.g. key is "info" in "info": {"Website": ["cloughjordancommunityfarm.ie"]} -->
 
                 % subkeys = sorted(value.keys())
@@ -185,7 +195,7 @@ $(document).ready(function(){
                             <!-- Control to delete the key-value pair -->
                             <span class="edit-farm-control" onclick="deleteKeyValuePair(this)">Delete this key-value pair</span>
                         </p>
-                        %end
+                        % end
                     </div>
 
                 <!-- End of subkey "{{subkey}}" -->
@@ -230,7 +240,7 @@ $(document).ready(function(){
                         <div class="edit-farm-align-right">
                             <span class="edit-farm-control" onclick="deleteInput(this)">Delete entry</span>
                         </div>
-                        %end
+                        % end
                     </div>
 
                 <!-- End of item in list for "{{key}}" -->
@@ -265,7 +275,7 @@ $(document).ready(function(){
     </p>
 
     <div class="input-container">
-        <input class="edit-farm-submit" type="submit" value="Update farm">
+        <input type="submit" value="Update farm">
         <span class="edit-farm-control" onclick="window.location.href = '{{root_rel_dir}}edit/{{farm}}'">Cancel</span>
     </div>
 </form>
