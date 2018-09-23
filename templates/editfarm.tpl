@@ -150,7 +150,7 @@ $(document).ready(function(){
             <!-- Special container for farm coords -->
             <div class="edit-farm-coords-container" id="editfarm-coords-container">
                 <!-- These are the hard-coded dimensions of the SVG map we're using :( -->
-                <div class="edit-farm-coords-svg-container">
+                <div class="edit-farm-coords-svg-container svg-container">
                     <!-- The canvas is required to make resizing the SVG work on IE -->
                     <canvas class="dummy-canvas" width="253.38666" height="317.33331"></canvas>
                     <svg id="edit-farm-map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 253.38666 317.33331" preserveAspectRatio="xMaxYMax meet">

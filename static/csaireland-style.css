@@ -431,6 +431,15 @@ div.edit-farm-align-right {
     text-align: right;
 }
 
+.edit-farm-coords-container {
+    width: 40%;
+}
+
+.edit-farm-coords-svg-container {
+    border: 1px solid #c5e2d9;
+    margin: 15px;
+}
+
 
 /*
  *
@@ -468,14 +477,8 @@ circle {
     opacity: 0.8;
 }
 
-.edit-farm-coords-container {
-    width: 40%;
-}
-
-.edit-farm-coords-svg-container {
+.svg-container {
     position: relative;
-    border: 1px solid #c5e2d9;
-    margin: 15px;
 }
 
 
