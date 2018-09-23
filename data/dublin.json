@@ -1,8 +1,13 @@
 {
+    "coords": [
+        "203.82048694893973,162.2275174301321"
+    ], 
     "description": [
         "Description coming soon"
     ], 
-    "images": [], 
+    "images": [
+        "images/uploads/dublin/profile-dublincsa.jpg"
+    ], 
     "info": {
         "Address": [
             "Kilwogan", 
