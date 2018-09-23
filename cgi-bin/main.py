@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 import cgi
 import datetime
+from functools import partial
 from functools import wraps
 import json
 import logging
@@ -52,7 +53,6 @@ def resources():
     return sessionutils.render_template('resources')
 #
 
-@get('/farms/<farm>')
 def farmprofile(farm):
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
 
@@ -89,8 +89,16 @@ def farmprofile(farm):
         get_profile_image=get_profile_image)
 #
 
+def __route_farms():
+    permissions_dict = datautils.get_permissions_dict()
+    LOGGER.info("asfas is %s" % (str(permissions_dict)))
+    for farmname in permissions_dict['farms']:
+        route('/%s' % farmname, 'GET', partial(farmprofile, farmname))
+#
+
 @get('/farms')
 def farms():
+    LOGGER.info("farms asdasdf")
     permissions_dict = datautils.get_permissions_dict()
     titles = {}
     coords = {}
@@ -428,4 +436,5 @@ def static(filepath):
 #
 
 datautils.setup_logging()
+__route_farms()
 bottle.run(debug=False, server='cgi')

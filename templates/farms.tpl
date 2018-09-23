@@ -13,7 +13,7 @@ $(document).ready(function(){
     });
 
     $('.map-circle-main').on('click', function() {
-        var url = '{{root_rel_dir}}farms/' + this.id.split('-')[2]
+        var url = '{{root_rel_dir}}' + this.id.split('-')[2]
         window.location.href = url;
     });
 
@@ -57,7 +57,7 @@ $(document).ready(function(){
             % for farmname in sorted(permissions_dict['farms']):
                 <p style="text-align:left;margin:0px">
                     % title = get_farm_title(farmname)
-                    <a href="farms/{{farmname}}" class="farm-links" id="link-{{farmname}}">{{title}}</a>
+                    <a href="{{farmname}}" class="farm-links" id="link-{{farmname}}">{{title}}</a>
                 </p>
             % end
         </div>
