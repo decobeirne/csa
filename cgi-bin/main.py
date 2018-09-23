@@ -90,7 +90,7 @@ def farmprofile(farm):
 #
 
 @get('/farms')
-def farmprofiles():
+def farms():
     permissions_dict = datautils.get_permissions_dict()
     titles = {}
     coords = {}
@@ -106,7 +106,7 @@ def farmprofiles():
         return coords.get(farmname, [''])
 
     return sessionutils.render_template(
-        'farmprofiles',
+        'farms',
         permissions_dict=permissions_dict,
         get_farm_title=get_farm_title,
         get_farm_coords=get_farm_coords)
