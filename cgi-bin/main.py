@@ -93,17 +93,23 @@ def farmprofile(farm):
 def farmprofiles():
     permissions_dict = datautils.get_permissions_dict()
     titles = {}
+    coords = {}
     for farmname in permissions_dict['farms']:
         farm_content = datautils.get_farm_content(farmname)
         titles[farmname] = farm_content['title'][0]
+        coords[farmname] = farm_content.get('coords', [''])[0].split(',')
 
     def get_farm_title(farmname):
         return titles.get(farmname, farmname.capitalize())
 
+    def get_farm_coords(farmname):
+        return coords.get(farmname, [''])
+
     return sessionutils.render_template(
         'farmprofiles',
         permissions_dict=permissions_dict,
-        get_farm_title=get_farm_title)
+        get_farm_title=get_farm_title,
+        get_farm_coords=get_farm_coords)
 #
 
 #

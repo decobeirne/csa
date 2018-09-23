@@ -73,7 +73,7 @@ $(function () {
         // https://stackoverflow.com/questions/3642035/jquerys-append-not-working-with-svg-element
         var circleElem = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         var circle = $(circleElem);
-        circle.addClass('map-circle').attr({id: 'map-circle-new', cx: circleX, cy: circleY, r: 3});
+        circle.addClass('map-circle-edit')attr({id: 'map-circle-new', cx: circleX, cy: circleY, r: 3});
         $('#edit-farm-map-svg').append(circle);
     };
 });

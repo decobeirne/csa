@@ -71,8 +71,8 @@
 }
 
 .profile-map-container {
-    /* old */
-    margin-bottom:  20px;
+    border: 1px solid #c5e2d9;
+    /* margin-bottom:  20px; */
 }
 
 .non-selectable {
@@ -211,6 +211,10 @@ a {
 }
 
 a:hover {
+     color: #92E027;
+}
+
+.hovered-link {
      color: #92E027;
 }
 
@@ -460,15 +464,27 @@ svg {
 }
 
 circle {
-    fill: #504416; /* brown */
-    stroke: #504416;
-    stroke-width: 0.6;
     display: block;
+    fill: #2A5D4C; /* dark green */
+    stroke: #2A5D4C;
+    stroke-width: 0.6;
+}
+
+.map-circle-main {
     cursor: pointer;
 }
 
-.map-circle-active {
+.map-circle-main:hover {
     fill: #92E027; /* lime */
+}
+
+.map-circle-main-active {
+    fill: #92E027; /* lime */
+}
+
+.map-circle-edit {
+    fill: #504416; /* brown */
+    stroke: #504416;
 }
 
 .tooltip-background {
