@@ -15,10 +15,16 @@
 
     <div class="profile-flex-container">
         <div class="profile-left-container">
-            <div class="profile-map-container">
-                <!-- TODO: we could just have each farm input their coordinates here -->
-                <!-- E.g. "images/map-cloughjordan.png" -->
-                <img src="{{root_rel_dir}}images/maps/map-{{farm}}.png"/>
+            <div class="profile-map-container svg-container">
+                % coords = farm_content.get('coords', [''])[0].split(',')
+                % if len(coords) == 2:
+                    <!-- The canvas is required to make resizing the SVG work on IE -->
+                    <canvas class="dummy-canvas" width="253.38666" height="317.33331"></canvas>
+                    <svg id="edit-farm-map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 253.38666 317.33331" preserveAspectRatio="xMaxYMax meet">
+                        <image id="edit-farm-map-img" width="253.38666" height="317.33331" xlink:href="{{root_rel_dir}}images/map/map-all-blank-no-dots-no-frame-fill.svg"></image>
+                        <circle cx="{{coords[0]}}" cy="{{coords[1]}}" r="3"></circle>
+                    </svg>
+                % end
             </div>
             
             <!-- TODO: we could put "Representative" first if required -->

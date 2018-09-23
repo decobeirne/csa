@@ -482,11 +482,6 @@ circle {
     fill: #92E027; /* lime */
 }
 
-.map-circle-edit {
-    fill: #504416; /* brown */
-    stroke: #504416;
-}
-
 .tooltip-background {
     fill: white;
     stroke: none;
