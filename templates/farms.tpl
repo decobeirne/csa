@@ -40,7 +40,7 @@ $(document).ready(function(){
                 <canvas class="dummy-canvas" width="253.38666" height="317.33331"></canvas>
                 <svg id="edit-farm-map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 253.38666 317.33331" preserveAspectRatio="xMaxYMax meet">
                     <image width="253.38666" height="317.33331" xlink:href="{{root_rel_dir}}images/map/map-all-blank-no-dots-no-frame-fill.svg"></image>
-                    % for farmname in permissions_dict['farms']:
+                    % for farmname in published_farms:
                         % coords = get_farm_coords(farmname)
                         % if len(coords) == 2:
                             <circle class="map-circle-main" id="map-circle-{{farmname}}" cx="{{coords[0]}}" cy="{{coords[1]}}" r="3"></circle>
@@ -54,7 +54,7 @@ $(document).ready(function(){
             <p>
                 Follow the links below to see profiles of some of the CSA farms in Ireland. There are up to ten active CSA farms known to us.
             </p>
-            % for farmname in sorted(permissions_dict['farms']):
+            % for farmname in sorted(published_farms):
                 <p style="text-align:left;margin:0px">
                     % title = get_farm_title(farmname)
                     <a href="{{farmname}}" class="farm-links" id="link-{{farmname}}">{{title}}</a>

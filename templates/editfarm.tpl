@@ -124,11 +124,11 @@ $(document).ready(function(){
     <input type="hidden" name="farmname" value="{{farm}}">
 
     % keys = data_layout['order']
+    % checkbox_inputs = data_layout['checkbox-inputs']
     % textarea_inputs = data_layout['textarea-inputs']
     % single_value_inputs = data_layout['single-value-inputs']
     % nested_inputs = data_layout['nested-inputs']
     % required_nested_inputs = data_layout['required-nested-inputs']
-
 
     % top_instructions = format_instructions(instructions['top'])
     <p class="edit-farm-instruction">
@@ -147,7 +147,6 @@ $(document).ready(function(){
             <p class="edit-farm-instruction">{{!instruction}}</p>
 
             %if key == 'coords':
-            <!-- Special container for farm coords -->
             <div class="edit-farm-coords-container" id="editfarm-coords-container">
                 <!-- These are the hard-coded dimensions of the SVG map we're using :( -->
                 <div class="edit-farm-coords-svg-container svg-container">
@@ -161,7 +160,11 @@ $(document).ready(function(){
                 % coords = content.get('coords', [''])[0]
                 <input type="hidden" name="coords" value="{{coords}}">
             </div>
-            <!-- End of farm coords container -->
+            % elif key in checkbox_inputs:
+            % checked = "checked" if (content.get(key, ["no"])[0] == "yes") else ""
+            <div class="input-container">
+                <span class="edit-farm-control-no-hover">{{title}}<input type="checkbox" name="{{key}}" {{checked}}/></span>
+            </div>
             % elif key in nested_inputs:
             <!-- Key "{{key}}" contains nested values, e.g. key is "info" in "info": {"Website": ["cloughjordancommunityfarm.ie"]} -->
 
@@ -222,19 +225,17 @@ $(document).ready(function(){
                     <div class="input-container">
                         % if key in textarea_inputs:
                             <textarea rows="8" name= "{{key}}">{{item}}</textarea>
+                        % elif key == "images":
+                            % checked = "checked" if (content.get('default-image', '') == item) else ""
+                            <input type="text" name="{{key}}$existing" value="{{item}}" style="background-color:#e3ede9" readonly>
+                            <img src="{{root_rel_dir}}{{item}}"/>
+                            <div class="edit-farm-align-right">
+                                <span class="edit-farm-control-no-hover">Select as profile image<input type="checkbox" class="is-default-image" name="is-default-img-{{item}}" {{checked}}/></span>
+                            </div>
                         % else:
-                            % if key == "images":
-                                % checked = "checked" if (content.get('default-image', '') == item) else ""
-                                <input type="text" name="{{key}}$existing" value="{{item}}" style="background-color:#e3ede9" readonly>
-                                <img src="{{root_rel_dir}}{{item}}"/>
-                                <div class="edit-farm-align-right">
-                                    <span class="edit-farm-control-no-hover">Select as profile image<input type="checkbox" class="is-default-image" name="is-default-img-{{item}}" {{checked}}/></span>
-                                </div>
-                            % else:
-                                <input type="text" name="{{key}}" value="{{item}}">
-                            % end
+                            <input type="text" name="{{key}}" value="{{item}}">
                         % end
-                        
+
                         % if key not in single_value_inputs:
                         <!-- Control to remove this input -->
                         <div class="edit-farm-align-right">
@@ -251,12 +252,10 @@ $(document).ready(function(){
                 <p>
                     % if key in textarea_inputs:
                         <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'textarea')">Add entry</span>
+                    % elif key == "images":
+                        <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'image')">Add entry</span>
                     % else:
-                        % if key == "images":
-                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'image')">Add entry</span>
-                        % else:
-                            <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'input')">Add entry</span>
-                        % end
+                        <span class="edit-farm-control" onclick="addInput(this, '{{key}}', 'input')">Add entry</span>
                     % end
                 </p>
                 % end

@@ -24,6 +24,8 @@ TMP_DIR = ROOT_DIR + '/tmp'
 if SCRIPTS_DIR not in sys.path:
     sys.path.append(SCRIPTS_DIR)
 
+PUBLISHED_FARMS = []
+
 import datautils
 import sessionutils
 
@@ -90,15 +92,17 @@ def farmprofile(farm):
 #
 
 def __route_farms():
+    global PUBLISHED_FARMS
     permissions_dict = datautils.get_permissions_dict()
-    LOGGER.info("asfas is %s" % (str(permissions_dict)))
     for farmname in permissions_dict['farms']:
-        route('/%s' % farmname, 'GET', partial(farmprofile, farmname))
+        farm_content = datautils.get_farm_content(farmname)
+        if farm_content.get('publish', ['no'])[0] == 'yes':
+            PUBLISHED_FARMS.append(farmname)
+            route('/%s' % farmname, 'GET', partial(farmprofile, farmname))
 #
 
 @get('/farms')
 def farms():
-    LOGGER.info("farms asdasdf")
     permissions_dict = datautils.get_permissions_dict()
     titles = {}
     coords = {}
@@ -115,6 +119,7 @@ def farms():
 
     return sessionutils.render_template(
         'farms',
+        published_farms=PUBLISHED_FARMS,
         permissions_dict=permissions_dict,
         get_farm_title=get_farm_title,
         get_farm_coords=get_farm_coords)
@@ -275,6 +280,7 @@ def editfarm_post(farm):
     # The layout of the "editprofile" page is constructed according to farm-data-layout.json, so
     # the logic here matches the "inputs" in that form.
     layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
+    checkbox_inputs = layout['checkbox-inputs']
     nested_inputs = layout['nested-inputs']
     updated_content = {}
 
@@ -301,7 +307,15 @@ def editfarm_post(farm):
     if default_image_keys:
         updated_content['default-image'] = default_image_keys[0][len(default_image_token):]
     LOGGER.info("form keys %s" % str(form_keys))
-    for key in sorted(form_keys):
+
+    # If a checkbox is unchecked, it will not be present in form.keys
+    for key in checkbox_inputs:
+        if key in form_keys:
+            updated_content[key] = ["yes"]
+        else:
+            updated_content[key] = ["no"]
+
+    for key in form_keys:
         # Some entries in the farm data contain nested data. E.g. under "info", the editor of the farm profile is 
         # allowed to add or remove key-value pairs, e.g. "Pick up location", which could be an address consisting
         # of multiple strings.
@@ -313,7 +327,7 @@ def editfarm_post(farm):
             continue
 
         # New images, "images", and "images-existing", have been dealt with above
-        if main_key == "images":
+        if main_key == "images" or main_key in checkbox_inputs:
             continue
 
         values = form.getlist(key)

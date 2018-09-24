@@ -1,6 +1,7 @@
 {
-"order": ["title", "coords", "images", "info", "description"],
+"order": ["publish", "title", "coords", "images", "info", "description"],
 "single-value-inputs": ["title"],
+"checkbox-inputs": ["publish"],
 "nested-inputs": ["info"],
 "textarea-inputs": ["description"],
 "required-nested-inputs": ["Rep"]

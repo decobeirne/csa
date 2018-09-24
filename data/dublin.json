@@ -35,6 +35,9 @@
             "https://csadublin.wordpress.com/"
         ]
     }, 
+    "publish": [
+        "yes"
+    ], 
     "title": [
         "Dublin City Centre"
     ]

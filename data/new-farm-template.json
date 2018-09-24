@@ -10,6 +10,6 @@
 		"Address": ["-"],
 		"Email": ["-"]
 	},
-	"description": ["Description coming soon"],
+	"publish": ["yes"],
 	"title": [""]
 }
