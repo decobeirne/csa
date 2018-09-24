@@ -1,12 +1,18 @@
 {
+    "captions": {
+        "images/uploads/dublin/profile-dublin.jpg": "Hop tasting, Dublin CSA", 
+        "images/uploads/dublin/profile-dublincsa.jpg": ""
+    }, 
     "coords": [
         "203.82048694893973,162.2275174301321"
     ], 
+    "default-image": "images/uploads/dublin/profile-dublin.jpg", 
     "description": [
         "Description coming soon"
     ], 
     "images": [
-        "images/uploads/dublin/profile-dublincsa.jpg"
+        "images/uploads/dublin/profile-dublincsa.jpg", 
+        "images/uploads/dublin/profile-dublin.jpg"
     ], 
     "info": {
         "Address": [

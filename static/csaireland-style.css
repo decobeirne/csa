@@ -415,10 +415,13 @@ textarea {
 }
 
 .edit-farm-control, .edit-farm-control-no-hover {
-    cursor: pointer;
     font-family: "Work Sans";
     font-size: 15px;
     color: #ADAFB2;
+}
+
+.edit-farm-control {
+    cursor: pointer;
 }
 
 .edit-farm-control:hover {
@@ -442,6 +445,16 @@ div.edit-farm-align-right {
 .edit-farm-coords-svg-container {
     border: 1px solid #c5e2d9;
     margin: 15px;
+}
+
+.edit-farm-span-dont-expand {
+    display:table-cell;
+    padding-right: 4px;
+}
+
+.edit-farm-span-expand {
+    display:table-cell;
+    width:100%;
 }
 
 

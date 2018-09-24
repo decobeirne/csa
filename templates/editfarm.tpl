@@ -129,6 +129,7 @@ $(document).ready(function(){
     % single_value_inputs = data_layout['single-value-inputs']
     % nested_inputs = data_layout['nested-inputs']
     % required_nested_inputs = data_layout['required-nested-inputs']
+    % captions = content.get('captions', {})
 
     % top_instructions = format_instructions(instructions['top'])
     <p class="edit-farm-instruction">
@@ -231,6 +232,11 @@ $(document).ready(function(){
                             <img src="{{root_rel_dir}}{{item}}"/>
                             <div class="edit-farm-align-right">
                                 <span class="edit-farm-control-no-hover">Select as profile image<input type="checkbox" class="is-default-image" name="is-default-img-{{item}}" {{checked}}/></span>
+                            </div>
+                            % caption = captions.get(item, '')
+                            <div>
+                                <span class="edit-farm-control-no-hover edit-farm-span-dont-expand">Caption</span>
+                                <span class="edit-farm-span-expand"><input type="text" style="" name="caption${{item}}" value="{{caption}}"/></span>
                             </div>
                         % else:
                             <input type="text" name="{{key}}" value="{{item}}">

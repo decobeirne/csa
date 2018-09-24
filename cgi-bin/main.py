@@ -285,12 +285,13 @@ def editfarm_post(farm):
     updated_content = {}
 
     # Deal with images on their own before going through other items
+    # First get existing images, not those from file inputs
+    values = form.getlist("images$existing")
+
+    # Get new images
     images = form["images"] if ("images" in form) else []
     if type(images) != list:
         images = [images]
-
-    # First get existing images, not those from file inputs
-    values = form.getlist("images$existing")
 
     for image in images:
         if image.filename:
@@ -300,6 +301,13 @@ def editfarm_post(farm):
 
     # Add image paths to dict
     updated_content["images"] = values
+
+    # Get captions. This will have only been added to existing images.
+    updated_content['captions'] = {}
+    caption_keys = [x for x in form_keys if x.startswith('caption$')]
+    for caption_key in caption_keys:
+        img = caption_key[8:]
+        updated_content['captions'][img] = form.getfirst(caption_key, "")
 
     # Set profile image, if selected
     default_image_token = 'is-default-img-'
