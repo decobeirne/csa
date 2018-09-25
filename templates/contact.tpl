@@ -1,23 +1,5 @@
 % rebase('base.tpl')
 
-<script>
-var setup = function() {
-    var slideFilenames = [
-        "leaf-and-root.jpg",
-        "Meeting at Cloughjordan.jpg",
-        "mitch corbett (1 of 3).jpeg",
-        "mitchcorbett (5 of 6).jpeg",
-        "Moy Farm.jpg",
-        "Slug control, Dublin CSA.jpg",
-        ];
-    addSlideImgs("{{root_rel_dir}}images/slideshow/", slideFilenames, showCaptions=false);
-    setupSlideEvents();
-};
-
-window.onload = setup;
-</script>
-
-<div class="slideshow-container" style="height:350px;"></div>
 <h2>How to contact us</h2>
 <p>
 Our member farms can be contacted directly. Their addresses, social media links, and contact
