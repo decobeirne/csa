@@ -74,18 +74,19 @@ def farmprofile(farm):
         for key in required_keys:
             keys.insert(0, key)
         return keys
-
     def get_profile_image(content):
         default = content.get('default-image', '')
         images = content.get('images', [])
         return "" if not images else (default if (default in images) else images[0])
 
     farm_content = datautils.get_farm_content(farm)
+    captions = farm_content.get('captions', {})
 
     return sessionutils.render_template(
         'farmprofile',
         farm=farm,
         farm_content=farm_content,
+        captions=captions,
         fixup_url=fixup_url,
         order_info_keys=order_info_keys,
         get_profile_image=get_profile_image)

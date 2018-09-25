@@ -1,15 +1,30 @@
 % rebase('base.tpl')
 
+<script>
+var setup = function() {
+    setupSlideEvents();
+};
+window.onload = setup;
+</script>
+
 <div class="profile-top-container">
     <h2>{{farm_content["title"][0]}}</h2>
     
     %if len(farm_content["images"]) > 0:
-        <div class="profile-img-container">
-            <!-- E.g. "images/profile/profile-cloughjordan.jpg" -->
-            % profile_image = get_profile_image(farm_content)
-            % if profile_image:
-                <img src="{{root_rel_dir}}{{profile_image}}"/>
+        <div class="slideshow-container" style="line-height: 400px;">
+            % is_first = True
+            % for image in farm_content["images"]:
+                % fig_class = 'class=show' if is_first else ''
+                % is_first = False
+                <figure {{fig_class}}>
+                    <img src="{{root_rel_dir}}{{image}}" style="max-height: 400px;">
+                    % caption = captions.get(image, '')
+                    % if caption != '':
+                        <figcaption>{{caption}}</figcaption>
+                    % end
+                </figure>
             % end
+            <span class="prev non-selectable">«</span><span class="next non-selectable">»</span><span class="pause non-selectable">pause</span>
         </div>
     %end
 
