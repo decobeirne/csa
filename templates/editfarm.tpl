@@ -7,7 +7,7 @@ $(function () {
         if (subKey == "") {
             return;
         }
-        
+
         var key = $(elm).parent().parent().attr('id');
         var newFullKey = key + '$' + subKey;
         var newSubKeyContainer = $('<div class="subkey-container"></div>');
@@ -17,11 +17,11 @@ $(function () {
         newSubKeyContainer.append(newPara);
         newSubKeyContainer.append(newInputContainer);
         newSubKeyContainer.append(newAddEntryPara);
-        
+
         var para = $(elm).parent();
         var lastSubKey = para.prevAll('div.subkey-container:first');
         newSubKeyContainer.insertAfter(lastSubKey);
-        
+
         $(elm).val("");
     };
 });
@@ -83,7 +83,7 @@ $(document).ready(function(){
     $('form').on('click', '.is-default-image', function() {
         $('.is-default-image').not(this).prop('checked', false);
     });
-    
+
     // Make inputs for adding a new key-value pair clickable
     $('.new-subkey').keypress(function (e) {
         var key = e.which;
