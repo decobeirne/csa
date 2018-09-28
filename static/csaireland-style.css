@@ -3,19 +3,35 @@
  * Containers
  *
  */
+html {
+    font-size: 16px;
+}
+
+@media only screen and (max-device-width: 800px) {
+    html {
+        font-size: 12px;
+    }
+}
+
 #top-level-container {
     margin: auto;
     width: 80%;
     max-width: 818px;
 }
 
+@media only screen and (max-device-width: 800px) {
+    #top-level-container {
+        width: 100%;
+    }
+}
+
 #banner-container-top {
     /* The original #00FF00 was a bit mad looking, so I reduced the brightness a bit. */
-    border-bottom: 6px solid #92E027;
+    border-bottom: 0.35em solid #92E027;
 }
 
 #banner-container-bottom {
-    border-top: 6px solid #92E027;
+    border-top: 0.35em solid #92E027;
 }
 
 #heading-container {
@@ -27,32 +43,31 @@
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    border-bottom: 1px solid #92E027;
-    margin-top: 20px;  /* TODO: Possibly remove. Margin between the link and the heading, to avoid clicking the link to home.html */
+    border-bottom: 0.06em solid #92E027;
+    margin-top: 1.1em;  /* Margin between the link and the heading, to avoid clicking the link to home.html */
 }
 
 .body-container {
     /* This a class so that it doesn't take preference over classes nested under it */
-    margin-bottom: 40px;  /* Padding at the bottom of the body of text */
-}
-
-.instagram-container-large, .instagram-container-small, .slideshow-container {
-    margin-top: 40px;  /* Similar space to that above a h2 */
+    margin-bottom: 2.5em;  /* Padding at the bottom of the body of text */
 }
 
 .profile-flex-container {
     display: -webkit-flex;
     display: flex;
     width: 100%;
-    margin-bottom: 40px;
+    margin-bottom: 2.5em;
 }
 
 .profile-img-container {
-    margin-bottom: 20px;
+    margin-bottom: 1.25em;
+}
+
+.main-profile-top-container {
+    margin-top: 2.5em;
 }
 
 .profile-left-container {
-    /* old */
     width: 40%;
 }
 
@@ -60,19 +75,27 @@
     width: 60%;
 }
 
-.profile-info-container {
-    /* new */
+.main-profile-left-container {
+    width: 60%;
+}
+
+.main-profile-right-container {
     width: 40%;
 }
 
-.profile-desc-container {
-    width: 60%;
-    display: none;
+@media only screen and (max-device-width: 800px) {
+    .main-profile-left-container {
+        width: 45%;
+    }
+
+    .main-profile-right-container {
+        width: 55%;
+    }
 }
 
 .profile-map-container {
-    border: 1px solid #c5e2d9;
-    /* margin-bottom:  20px; */
+    border: 0.06em solid #c5e2d9;
+    margin-bottom:  1.25em;
 }
 
 .non-selectable {
@@ -96,89 +119,83 @@ p {
     display: block;
     -webkit-margin-before: 1em;
     -webkit-margin-after: 1em;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
+    -webkit-margin-start: 0em;
+    -webkit-margin-end: 0em;
 }
 
 #heading-container h1 {
-    margin-top: 20px;  /* Corresponds with margin-top of the links-container that sits below the heading. */
-    margin-bottom: 0px;  /* TODO: Possibly remove. Reduce margin below to avoid clicking the link to home.html */
+    margin-top: 0.35em;  /* Corresponds with margin-top of the links-container that sits below the heading. */
+    margin-bottom: 0em;  /* TODO: Possibly remove. Reduce margin below to avoid clicking the link to home.html */
 }
 
 p.footnote {
-    padding-top: 20px;  /* Extra padding above a footnote */
+    padding-top: 1.25em;  /* Extra padding above a footnote */
 }
 
 .body-container p, .body-container ol, .bodycontainer input {
-    /* padding-left: 80px; */
-    /* padding-right: 80px; */
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-bottom:  20px;
+    padding-left: 3em;
+    padding-right: 3em;
+    padding-bottom:  1.25em;
     text-align: justify;
 }
 
+@media only screen and (max-device-width: 800px) {
+    .body-container p, .body-container ol, .bodycontainer input {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+}
+
 .body-container h3 {
-    /*padding-left: 80px;*/  /* More readable when these are a little to the left. */
-    /*padding-right: 80px;*/
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 .no-indent-container p {
-    padding-left: 0px;
-    padding-right: 0px;
+    padding-left: 0em;
+    padding-right: 0em;
 }
 
 .profile-flex-container p {
-    margin-top: 0px;  /* Override default in order to align with image in other column */
+    margin-top: 0em;  /* Override default in order to align with image in other column */
 }
 
 .profile-left-container p {
-    /* old */
-    padding-left: 0px;  /* Override */
-    padding-right: 0px;  /* Override */
-    padding-bottom: 0px;  /* Override. Already have an auto margin below, so don't need padding between these short paragraphs */
+    padding-left: 0em;  /* Override */
+    padding-right: 0em;  /* Override */
+    padding-bottom: 0em;  /* Override. Already have an auto margin below, so don't need padding between these short paragraphs */
     text-align: left;
     word-wrap: break-word;
 }
 
 .profile-right-container p {
-    /* old */
-    padding-left: 40px;  /* Override */
-    padding-right: 0px;  /* Override */
+    padding-left: 2.5em;  /* Override */
+    padding-right: 0em;  /* Override */
 }
 
-.profile-misc-container p {
-    /* new */
-    padding-left: 0px;  /* Override */
-    padding-right: 0px;  /* Override */
-    padding-bottom: 0px;  /* Override. Already have an auto margin below, so don't need padding between these short paragraphs */
-    text-align: left;
-    word-wrap: break-word;
-}
-
-.profile-desc-container p {
-    /* new */
-    padding-left: 0px;  /* Override */
-    padding-right: 0px;  /* Override */
+@media only screen and (max-device-width: 800px) {
+    /* On mobile, gap was too big in the middle, and also text was too close to the right */
+    .profile-right-container p {
+        padding-left: 1.5em;  /* Override */
+        padding-right: 0.5em;  /* Override */
+    }
 }
 
 .flash p {
-    padding: 5px 10px 5px 10px;
+    padding: 0.3em 0.6em 0.3em 0.6em;
     background-color: #cae7de;
 }
 
 .admin-info-container p {
-    padding-bottom: 0px;
+    padding-bottom: 0em;
 }
 
 .admin-container p {
-    padding-bottom: 0px;
+    padding-bottom: 0em;
 }
 
 li {
-    margin-bottom: 20px;
+    margin-bottom: 1.25em;
 }
 
 /*
@@ -187,7 +204,7 @@ li {
  *
  */
 .profile-container img {
-    /* margin-top: 20px; */
+    /* margin-top: 1.25em; */
 }
 
 .banner-img {
@@ -219,9 +236,9 @@ a:hover {
 }
 
 .link-item, .active-link-item {
-    padding: 10px;
+    padding: 0.6em;
     font-family: "Work Sans";
-    font-size: 13px;
+    font-size: 1em;
     text-transform: uppercase;
 }
 
@@ -250,14 +267,14 @@ a:hover {
 .profile-info-key {
     font-family: "Playfair Display";
     font-weight: bold;
-    font-size: 17px;
+    font-size: 1.1em;
     color: #2A5D4C;
 }
 
 .profile-info-value {
     font-family: "Work Sans";
     font-weight: 400;
-    font-size: 14px;
+    font-size: 1em;
     color: #ADAFB2;
 }
 
@@ -270,12 +287,12 @@ a:hover {
 }
 
 .map-text {
-    font-size: 11px;
+    font-size: 1em;
     fill: #2A5D4C;
 }
 
 .map-link {
-    font-size: 12px;
+    font-size: 1em;
     fill: #ADAFB2;  /* Match regular HTML links */
 }
 
@@ -285,7 +302,7 @@ a:hover {
 
 h1 {
     font-family: "Playfair Display";
-    font-size: 56px;
+    font-size: 3.7em;
     font-weight: 300;
     color: #2A5D4C;
     text-transform: uppercase;
@@ -293,30 +310,49 @@ h1 {
 
 h2 {
     font-family: "Playfair Display";
-    font-size: 30px;
+    font-size: 1.5em;
     font-weight: 500;
     color: #2A5D4C;
-    border-bottom: 1px solid #92E027;
+    border-bottom: 0.06em solid #92E027;
 }
 
 h3, .edit-farm-key {
     font-family: "Playfair Display";
-    font-size: 22px;
+    font-size: 1.1em;
     font-weight: 600;
     color: #2A5D4C;
-    margin-bottom: 0px;
+    margin-bottom: 0em;
 }
 
 u {  /* Changes the behaviour of <u></u> tags. */
     text-decoration: none;
-    border-bottom: 1px solid #92E027;
+    border-bottom: 0.06em solid #92E027;
 }
 
 /* p, ol, form */
 p, ol, textarea, input {
     font-family: "Work Sans";
-    font-size: 17px;
+    font-size: 1em;
     color: #484B49;
+}
+
+/* Break long words */
+p {
+    /* These are technically the same, but use both */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    /* word-break: break-all; */
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
 }
 
 /*
@@ -325,41 +361,41 @@ p, ol, textarea, input {
  *
  */
 .edit-farm-container {
-    border: 1px solid #9fc6b9;  /* A bit less saturation than 2A5D4C */
-    /* padding: 2px; */
-    margin-top: 1px;
-    margin-bottom: 1px;
+    border: 0.06em solid #9fc6b9;  /* A bit less saturation than 2A5D4C */
+    padding-bottom: 0.3em;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
 }
 
 .edit-farm-container p {
     /* Override large padding in typical paragraphs */
-    padding-bottom: 0px;
-    margin-top: 15px;
-    margin-bottom: 0px;
+    padding-bottom: 03m;
+    margin-top: 1em;
+    margin-bottom: 0em;
 }
 
 .subkey-container {
-    border: 1px solid #c5e2d9;  /* Less saturation than 2A5D4C again */
+    border: 0.06em solid #c5e2d9;  /* Less saturation than 2A5D4C again */
     /* padding: 2px; */
-    margin: 1px;
-    padding-bottom: 4px;
+    margin: 0.1em;
+    padding-bottom: 0.3em;
 }
 
 .admin-info-container {
-    border: 1px solid #2A5D4C;
-    margin-top: 1px;
-    margin-bottom: 1px;
+    border: 0.06em solid #2A5D4C;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
     background-color: #e3ede9;  /* Very light version of 2A5D4C */
 }
 
 .admin-info-container p {
     font-family: "Work Sans";
-    font-size: 15px;
+    font-size: 1em;
     line-height: 1.5em;
 }
 
 .edit-farm-instruction {
-    font-size: 14px;
+    font-size: 1em;
     color: black;
     font-style: italic;
 }
@@ -369,21 +405,21 @@ p, ol, textarea, input {
 }
 
 .input-container {
-    margin-left: 15px;
-    margin-right: 15px;
-    margin-top: 5px;
-    margin-bottom: 10px;
+    margin-left: 0.9em;
+    margin-right: 0.9em;
+    margin-top: 0.3em;
+    margin-bottom: 0.6em;
 }
 
 .body-container input {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
 }
 
 .body-container textarea {
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-bottom: 5px;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    padding-bottom: 0.3em;
     text-align: justify;
 }
 
@@ -398,7 +434,7 @@ input[type=checkbox] {
 input[type=checkbox] {
     position: relative;
     vertical-align: middle;
-    margin: 0px 0px 0px 4px;
+    margin: 0em 0em 0em 0.3em;
 }
 
 input[type=submit] {
@@ -416,7 +452,7 @@ textarea {
 
 .edit-farm-control, .edit-farm-control-no-hover {
     font-family: "Work Sans";
-    font-size: 15px;
+    font-size: 1em;
     color: #ADAFB2;
 }
 
@@ -444,12 +480,12 @@ div.edit-farm-align-right {
 
 .edit-farm-coords-svg-container {
     border: 1px solid #c5e2d9;
-    margin: 15px;
+    margin: 1em;
 }
 
 .edit-farm-span-dont-expand {
     display:table-cell;
-    padding-right: 4px;
+    padding-right: 0.3px;
 }
 
 .edit-farm-span-expand {
@@ -515,9 +551,10 @@ circle {
     position: relative;  /* Necessary to allow absolute positioning of text on the image */
     display: block;
     overflow: hidden;
-    margin-bottom: 40px;
-    height: 400px;
-    line-height: 400px;  /* Should be same as height, in order to align imgs vertically. Is checked in JS anyway. */
+    margin-top: 1.9em;  /* Similar space to that above a h2 */
+    margin-bottom: 2.5em;
+    height: 25em;
+    line-height: 25em;  /* Should be same as height, in order to align imgs vertically. Is checked in JS anyway. */
     text-align: center;  /* Aligns imgs horizonally */
 }
 
@@ -527,14 +564,14 @@ figure{
     
     -webkit-margin-before: 0em;
     -webkit-margin-after: 0em;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
+    -webkit-margin-start: 0em;
+    -webkit-margin-end: 0em;
 }
 
 figure img{  /* Overrides values set for regular imgs */
     width: auto;
     height: auto;
-    max-height: 400px;  /* Should be the same as the container height. Is checked by JS */
+    max-height: 25em;  /* Should be the same as the container height. Is checked by JS */
     max-width: 100%;
     display: inline-block;  /* To align vertically */
     vertical-align: middle;
@@ -552,7 +589,7 @@ figcaption{
     font-family: "Playfair Display";
     font-weight: 200;
     font-style: italic;
-    font-size: 1.5em;
+    font-size: 1.4em;
     color: #FFFFFF;
 
     padding-top: 0.15em;
@@ -614,7 +651,6 @@ figure.show{
 .prev{
     left: 0;
 }
-
 
 
 
