@@ -1,18 +1,40 @@
 {
     "captions": {
-        "images/uploads/dublin/profile-dublin.jpg": "Hop tasting, Dublin CSA", 
-        "images/uploads/dublin/profile-dublincsa.jpg": ""
+        "images/uploads/dublin/chickens-dublin.jpg": "", 
+        "images/uploads/dublin/dublin-courgettes.jpg": "", 
+        "images/uploads/dublin/dublin-more-chickens.jpg": "", 
+        "images/uploads/dublin/dublin-more-ducks.jpg": "", 
+        "images/uploads/dublin/dublin-skarecrow.jpg": "", 
+        "images/uploads/dublin/dublin-tunnel.jpg": "", 
+        "images/uploads/dublin/ducks-dublin.jpg": "", 
+        "images/uploads/dublin/hop-tasting-dublin.jpg": "Hop tasting, Dublin CSA", 
+        "images/uploads/dublin/seamus-dublin.jpg": "Seamus Bradley, Dublin CSA", 
+        "images/uploads/dublin/work-day-2013-dublin.jpg": "Farm Day, Dublin CSA, 2013", 
+        "images/uploads/dublin/work-day-2017-dublin.jpg": "Farm Day, Dublin CSA, spring 2017", 
+        "images/uploads/dublin/work-day-dublin.jpg": ""
     }, 
     "coords": [
         "203.82048694893973,162.2275174301321"
     ], 
-    "default-image": "images/uploads/dublin/profile-dublin.jpg", 
     "description": [
-        "Description coming soon"
+        "Dublin CSA has been created in 2012 by a few people passionate about community farming. Since it has started, Seamus, our primary farmer, has been growing vegetables for Dublin CSA, itself growing from about 10 to 35 members today.", 
+        "We offer full share (weekly collection) or half share (bi-weekly collection) from June to February, each collection including 5 varieties in average. Seamus bring the vegetables to Smithfield on Thursdays between 18:30 and 19:00 and as we aim to reduce packaging, members are expected to come with their own bag/container.", 
+        "For us, CSA is more than a way to feed you with healthy, natural and local food. It is commitment, learning and community engagement. Members voluntarily carry out the coordination of the CSA (membership, communication, events). Throughout the season, there are also additional and entirely voluntary opportunities to get to know fellow members better and have fun on the farm.", 
+        "With our project at Seamus\u2019s farm, we try to find out how to make it practical for us, how to make it work. It is an ongoing process of learning, experiencing and discovering."
     ], 
     "images": [
-        "images/uploads/dublin/profile-dublincsa.jpg", 
-        "images/uploads/dublin/profile-dublin.jpg"
+        "images/uploads/dublin/hop-tasting-dublin.jpg", 
+        "images/uploads/dublin/chickens-dublin.jpg", 
+        "images/uploads/dublin/dublin-more-chickens.jpg", 
+        "images/uploads/dublin/dublin-more-ducks.jpg", 
+        "images/uploads/dublin/ducks-dublin.jpg", 
+        "images/uploads/dublin/seamus-dublin.jpg", 
+        "images/uploads/dublin/work-day-2013-dublin.jpg", 
+        "images/uploads/dublin/work-day-2017-dublin.jpg", 
+        "images/uploads/dublin/work-day-dublin.jpg", 
+        "images/uploads/dublin/dublin-courgettes.jpg", 
+        "images/uploads/dublin/dublin-skarecrow.jpg", 
+        "images/uploads/dublin/dublin-tunnel.jpg"
     ], 
     "info": {
         "Address": [
@@ -21,11 +43,11 @@
             "Co. Kildare"
         ], 
         "CSA pickup location": [
-            "Smithfield square", 
+            "Smithfield Square", 
             "Beside the Third Space cafe"
         ], 
         "Contact phone": [
-            "-"
+            "087 9903139"
         ], 
         "Email": [
             "csadublin@gmail.com"
@@ -45,6 +67,6 @@
         "yes"
     ], 
     "title": [
-        "Dublin City Centre"
+        "Dublin City CSA"
     ]
 }

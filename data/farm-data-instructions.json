@@ -1,11 +1,11 @@
 {
 "top": ["Update your farm profile by editing the text boxes below and clicking <b>Update farm</b> at the bottom of the page", "To undo any changes, click <b>Cancel</b> to refresh the page with the existing profile.", "After updating, you'll be able to see the changes on the <b>Farm Profiles</b> page"],
 "coords": ["Click to set your location"],
-"publish": ["Unclick the check-box to hide your profile", "To completely delete your profile contact admin"],
+"publish": ["Unclick the checkbox to hide your profile", "To completely delete your profile contact admin"],
 "bottom": ["<b>Update farm</b> will save your changes to the database.", "<b>Cancel</b> will wipe all your changes and retrieve the existing farm profile from the database."],
-"add-key-value-pair": ["To add an additional key-value pair, enter the desired key in the text box and click the link underneath", "A key would be e.g. <b>Website</b> while the value might be <b>http://blahblah.com</b>"],
+"add-key-value-pair": ["To add an additional key-value pair, enter the desired key in the text box and click the link underneath", "A key might be e.g. <b>Website</b> while the value might be <b>http://blahblah.com</b>"],
 "title": ["The name of your CSA"],
-"images": ["Add one or more images of your CSA", "Click the checkbox under the image you'd like to have on the farm profile page", "Other images are then included in the slideshow on the main page"],
+"images": ["Add one or more images of your CSA", "These will appear in a slideshow on your farm profile page", "A random selection also appears on the front page", "Add a short caption to images if you like, or leave blank"],
 "info": ["Key-value pairs providing information about the CSA.", "If entering a website please put 'http://' or 'https://' at the front as appropriate"],
 "description": ["One or more paragraphs describing the CSA.", "Paragraphs are easier to read if kept to around 100 words or less."]
 }

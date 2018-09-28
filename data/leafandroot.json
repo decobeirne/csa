@@ -1,0 +1,47 @@
+{
+    "captions": {
+        "images/uploads/leafandroot/leaf-and-root-fergal-and-manu.jpg": "Fergal and Manu, Leaf and Root Farm", 
+        "images/uploads/leafandroot/leaf-and-root.jpg": ""
+    }, 
+    "coords": [
+        "101.1218188831812,167.66959020071138"
+    ], 
+    "description": [
+        "Our CSA has been running since 2015.  Our season runs from June until December.  We also sell in the Loughrea market on Thursday mornings during the season and supply Loam restaurant in Galway year-round.", 
+        "Growing food takes time, effort and plenty of work but we\u2019ve been building slowly and steadily since we first started the farm in 2012.", 
+        "Our aim is to produce healthy and affordable food for the local community and assure a livelihood for ourselves \u2013 we are also interested in fruit production and have an orchard for apples as well as a soft fruit area."
+    ], 
+    "images": [
+        "images/uploads/leafandroot/leaf-and-root.jpg", 
+        "images/uploads/leafandroot/leaf-and-root-fergal-and-manu.jpg"
+    ], 
+    "info": {
+        "Address": [
+            "Leaf and Root Farm,", 
+            "Kilmeen, Loughrea,", 
+            "County Galway, Ireland"
+        ], 
+        "Contact phone": [
+            "087 7806155"
+        ], 
+        "Email": [
+            "leafandrootinfo@gmail.com"
+        ], 
+        "Farmers": [
+            "Fergal Anderson", 
+            "Emanuela Russo"
+        ], 
+        "Rep": [
+            "-"
+        ], 
+        "Website": [
+            "http://www.leafandroot.org/"
+        ]
+    }, 
+    "publish": [
+        "yes"
+    ], 
+    "title": [
+        "Leaf and Root Farm"
+    ]
+}

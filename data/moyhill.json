@@ -1,0 +1,55 @@
+{
+    "captions": {
+        "images/uploads/moyhill/moy-hill-aerial.jpg": "Moy Hill Farm", 
+        "images/uploads/moyhill/moy-hill-boxes.jpeg": "", 
+        "images/uploads/moyhill/moy-hill-fergal-smith.jpg": "Fergal Smith, Moy Hill Farm", 
+        "images/uploads/moyhill/moy-hill-social.jpg": "", 
+        "images/uploads/moyhill/moy-hill-surf.jpeg": "", 
+        "images/uploads/moyhill/moy-hill-work.jpeg": ""
+    }, 
+    "coords": [
+        "65.78558398522202,195.18901003810976"
+    ], 
+    "description": [
+        "Each Friday (in harvest season) morning, we - those living and working at moy hill farm - get up extra early for the harvest. By mid afternoon the work is done; our timber packing shed full of amazing, healing, potent vegetables. 50 families will receive a box each; more will change hands at the market.", 
+        "Our mission is to feed local people, love earth and inspire. To progress in that direction we have and continue to work with whatever is necessary - soil, seeds, shovels and long days in the field; farmers, banks, politics (Fergal stood for election last year), NGOs, charities, schools and universities; as well as yoga, meditation, non-violent communication and community building practices. We grow food but also hold an open door for anyone to stay, work, learn, grow, heal."
+    ], 
+    "images": [
+        "images/uploads/moyhill/moy-hill-aerial.jpg", 
+        "images/uploads/moyhill/moy-hill-boxes.jpeg", 
+        "images/uploads/moyhill/moy-hill-fergal-smith.jpg", 
+        "images/uploads/moyhill/moy-hill-social.jpg", 
+        "images/uploads/moyhill/moy-hill-surf.jpeg", 
+        "images/uploads/moyhill/moy-hill-work.jpeg"
+    ], 
+    "info": {
+        "Address": [
+            "Moy Hill, Moy,", 
+            "Lahinch,", 
+            "Co. Clare"
+        ], 
+        "Contact phone": [
+            "087 1301937"
+        ], 
+        "Email": [
+            "moyhillfarm@gmail.com"
+        ], 
+        "Farmers": [
+            "Matt Smith", 
+            "Fergal Smith", 
+            "Mitch Corbett"
+        ], 
+        "Rep": [
+            "-"
+        ], 
+        "Website": [
+            "https://www.moyhillfarm.com/"
+        ]
+    }, 
+    "publish": [
+        "yes"
+    ], 
+    "title": [
+        "Moy Hill Farm"
+    ]
+}
