@@ -75,7 +75,7 @@ def render_template(name, **kwargs):
     cwd = os.getcwd()
     try:
         os.chdir(TPL_DIR)
-        tpl = bottle.SimpleTemplate(source=open(name + '.tpl').read())
+        tpl = bottle.SimpleTemplate(source=open(name + '.tpl').read(), lookup=['.'])
         username_cookie = bottle.request.get_cookie('username')
         role_cookie = bottle.request.get_cookie('role')
         farmname_cookie = bottle.request.get_cookie('farmname')
