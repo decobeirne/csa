@@ -11,13 +11,13 @@ window.onload = setup;
     <h2>{{farm_content["title"][0]}}</h2>
     
     %if len(farm_content["images"]) > 0:
-        <div class="slideshow-container" style="line-height: 400px;">
+        <div class="slideshow-container" style="line-height: 25em;">
             % is_first = True
             % for image in farm_content["images"]:
                 % fig_class = 'class=show' if is_first else ''
                 % is_first = False
                 <figure {{fig_class}}>
-                    <img src="{{root_rel_dir}}{{image}}" style="max-height: 400px;">
+                    <img src="{{root_rel_dir}}{{image}}" style="max-height: 25em;">
                     % caption = captions.get(image, '')
                     % if caption != '':
                         <figcaption>{{caption}}</figcaption>

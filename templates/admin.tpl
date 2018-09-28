@@ -33,7 +33,7 @@ $(function () {
     <p class="edit-farm-instruction">
         <i class="fa fa-info-circle"></i> Add, remove or update values and click <b>Update database</b> at the bottom of the page to save to the server, or <b>Cancel</b> to undo your changes and refresh this page.
         <br>
-        <i class="fa fa-info-circle"></i> Any admin or editor added is given the default password "csa", which they should reset asap.
+        <i class="fa fa-info-circle"></i> Any admin or editor added is given the default password "csa". They should be instructed to reset this asap.
     </p>
 
     <div class="edit-farm-container">

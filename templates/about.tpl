@@ -20,7 +20,7 @@ var setup = function() {
 window.onload = setup;
 </script>
 
-<div class="slideshow-container" style="height:300px;"></div>
+<div class="slideshow-container" style="height:18.75x;"></div>
 <h2>Who are we?</h2>
 <p>
 CSA Network Ireland is the national network for CSA farms, and aims to

@@ -30,9 +30,9 @@ $(document).ready(function(){
 </script>
 
 <!-- Override style instead of defining new classes. margin-top here matches the margin around a h2. -->
-<div class="profile-top-container" style="margin-top:40px;">
+<div class="main-profile-top-container">
     <div class="profile-flex-container">
-        <div class="profile-left-container" style="width:60%;">
+        <div class="main-profile-left-container">
             <div class="profile-map-container svg-container">
 
                 <!-- These are the hard-coded dimensions of the SVG map we're using :( -->
@@ -50,7 +50,7 @@ $(document).ready(function(){
 
             </div>
         </div>
-        <div class="profile-right-container" style="width:40%;">
+        <div class="main-profile-right-container">
             <p>
                 Follow the links below to see profiles of some of the CSA farms in Ireland. There are up to ten active CSA farms known to us.
             </p>
