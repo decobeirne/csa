@@ -16,7 +16,7 @@ The content for each CSA is serialized to a json file under `data`, e.g. `dublin
 ----
 Copy the contents of `cgi-bin` to `/webspace/cgi-bin`.
 
-Copy everything else to `/webspace/httpdocs/communitysupportedagriculture.ie`.
+Copy everything else to `/webspace/httpdocs/communitysupportedagriculture.ie`. Change the text in `key.txt`, used for session management.
 
 The `.htaccess` file tells Apache to send any requests for a URL under `communitysupportedagriculture.ie` to `/cgi-bin/main.py`.
 
@@ -28,4 +28,9 @@ Files corresponding to the dynamic pages, e.g. `farms.tpl`, `farmprofiles.tpl`, 
 
 Note that, for consistency, the name of each template file, e.g. `about.tpl`, is the same as the corresponding URL, e.g. `communitysupportedagriculture.ie/about`.
 
-If adding a new page, a function to instruct the server to use a particular template is required. See `@route('/about')` in `/cgi-bin/main.py` as an example.
+### Adding a new page
+Add a template. Take care to use the existing naming convention, e.g. for _mypage_ add `templates/mypage.tpl`
+
+A function to instruct the server to use a particular template is required. See `@route('/about')` in `/cgi-bin/main.py` as an example.
+
+To include a link to the page on the top bar, add an entry to the list in `scripts/sessionutils.py`
