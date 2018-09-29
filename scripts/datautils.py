@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+from random import shuffle
 import shutil
 import uuid
 
@@ -23,6 +24,10 @@ def setup_logging():
     logger.addHandler(file_handler)
 
 
+#
+# Farm data
+#
+
 def get_farm_json_file(farmname):
     return os.path.join(DATA_DIR, '%s.json' % farmname)
 
@@ -32,7 +37,7 @@ def get_new_farm_content(farmname):
     content = json.load(open(json_file, 'rb'))
     content['title'] = [farmname.capitalize()]
     return content
-#
+
 
 def get_farm_content(farmname):
     json_file = get_farm_json_file(farmname)
@@ -82,6 +87,61 @@ def delete_removed_imgs(farmname, updated_content):
             LOGGER.info("Removed img [%s] not on disk so did not not" % img)
 
 
+def delete_farm(farm, permissions_dict):
+    permissions_dict['farms'].remove(farm)
+    for editor in permissions_dict['permissions']:
+        if permissions_dict['permissions'][editor] == farm:
+            permissions_dict['permissions'][editor] = ''
+    imgs_dir = get_imgs_dir(farm)
+    shutil.rmtree(imgs_dir)
+    LOGGER.critical("Deleted imgs dir [%s] for farm [%s]" % (imgs_dir, farm))
+    json_file = get_farm_json_file(farm)
+    if os.path.isfile(json_file):
+        os.remove(json_file)
+        LOGGER.critical("Deleted dict [%s] for farm [%s]" % (json_file, farm))
+    else:
+        LOGGER.info("Dict [%s] for farm [%s] not on disk so did not delete" % (json_file, farm))
+
+
+def add_farm(farm, permissions_dict):
+    permissions_dict['farms'] = _add_unique(farm, permissions_dict['farms'])
+
+
+def update_published_images():
+    """
+    Iterate through published farms creating a list of images that can be included
+    in slideshows
+    """
+    published_imgs = []
+    permissions_dict = get_permissions_dict()
+    for farm in permissions_dict.get('farms', []):
+        farm_content = get_farm_content(farm)
+        if 'yes' != farm_content.get('publish', ['no'])[0]:
+            continue
+        imgs = farm_content.get('images', [])
+        captions = farm_content.get('captions', {})
+        for img in imgs:
+            caption = captions.get(img, '')
+            published_imgs.append((img, caption))
+    json_file = os.path.join(DATA_DIR, 'published_imgs.json')
+    json.dump(published_imgs, open(json_file, 'wb'), indent=4, sort_keys=True)
+
+
+def get_published_images(randomize, max_imgs):
+    """
+    Get a sublist of all published images, optionally randomized"
+    """
+    imgs = json.load(open(os.path.join(DATA_DIR, 'published_imgs.json'), 'rb'))
+    imgs = imgs[:max_imgs]
+    if shuffle:
+        shuffle(imgs)
+    return imgs
+
+
+#
+# Permissions
+#
+
 def get_permissions_dict():
     return json.load(open(os.path.join(DATA_DIR, 'permissions.json'), 'rb'))
 
@@ -111,26 +171,6 @@ def add_user(user, role, permissions_dict):
     permissions_dict['password_salts'][user] = salt
     if role == 'editor':
         permissions_dict['permissions'][user] = ''
-
-
-def delete_farm(farm, permissions_dict):
-    permissions_dict['farms'].remove(farm)
-    for editor in permissions_dict['permissions']:
-        if permissions_dict['permissions'][editor] == farm:
-            permissions_dict['permissions'][editor] = ''
-    imgs_dir = get_imgs_dir(farm)
-    shutil.rmtree(imgs_dir)
-    LOGGER.critical("Deleted imgs dir [%s] for farm [%s]" % (imgs_dir, farm))
-    json_file = get_farm_json_file(farm)
-    if os.path.isfile(json_file):
-        os.remove(json_file)
-        LOGGER.critical("Deleted dict [%s] for farm [%s]" % (json_file, farm))
-    else:
-        LOGGER.info("Dict [%s] for farm [%s] not on disk so did not delete" % (json_file, farm))
-
-
-def add_farm(farm, permissions_dict):
-    permissions_dict['farms'] = _add_unique(farm, permissions_dict['farms'])
 
 
 def make_salt():

@@ -2,25 +2,26 @@
 
 <script>
 var setup = function() {
-    var slideFilenames = [
-        "cap=Fergal and Manu, Leaf and Root Farm.jpg",
-        "cap=Fergal Smith, Moy Hill.jpg",
-        "cap=Hop tasting at Dublin CSA, 2016.jpg",
-        "cap=Aerial view of Moy Farm.jpg",
-        "cap=Nathan Jackson, Derrybeg.png",
-        "cap=Paddy Byrne, Skerries.jpg",
-        "cap=Seamus Bradley, Dublin CSA.jpg",
-        "cap=Sustainable Skerries first box morning.jpg",
-        "cap=Work day at Dublin CSA, 2017.jpg",
-        ];
-    addSlideImgs("images/slideshow/", slideFilenames, showCaptions=true);
     setupSlideEvents();
 };
 window.onload = setup;
 </script>
 
-<div class="slideshow-container"></div>
 <h2>What is a CSA?</h2>
+<div class="slideshow-container" style="line-height: 25em;">
+    % is_first = True
+    % for (image, caption) in images:
+        % fig_class = 'class=show' if is_first else ''
+        % is_first = False
+        <figure {{fig_class}}>
+            <img src="{{root_rel_dir}}{{image}}" style="max-height: 25em;">
+            % if caption != '':
+                <figcaption>{{caption}}</figcaption>
+            % end
+        </figure>
+    % end
+    <span class="prev non-selectable">«</span><span class="next non-selectable">»</span><span class="pause non-selectable">pause</span>
+</div>
 <p>
 Community Supported Agriculture is a partnership between a group of
 people and a farmer. The members receive a share in the CSA when they

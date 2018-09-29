@@ -25,6 +25,7 @@ if SCRIPTS_DIR not in sys.path:
     sys.path.append(SCRIPTS_DIR)
 
 PUBLISHED_FARMS = []
+MAX_IMAGES_IN_SLIDESHOW = 15
 
 import datautils
 import sessionutils
@@ -37,12 +38,16 @@ import sessionutils
 @route('/')
 @route('/home')
 def home():
-    return sessionutils.render_template('home')
+    return sessionutils.render_template(
+        'home',
+        images=datautils.get_published_images(randomize=True, max_imgs=MAX_IMAGES_IN_SLIDESHOW))
 
 
 @route('/about')
 def about():
-    return sessionutils.render_template('about')
+    return sessionutils.render_template(
+        'about',
+        images=datautils.get_published_images(randomize=True, max_imgs=MAX_IMAGES_IN_SLIDESHOW))
 
 
 @route('/contact')
@@ -187,7 +192,7 @@ def login_post():
 
 @route('/logout')
 def logout():
-    username = request.get_cookie('username', '')
+    username = request.get_cookie('username', default='', secret=sessionutils.KEY)
     sessionutils.clear_session()
     if username:
         now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
@@ -200,13 +205,13 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         dest = request.path[1:]  # Strip first '/' for convenience, and aesthetics
-        username = request.get_cookie('username', '')
+        username = request.get_cookie('username', default='', secret=sessionutils.KEY)
         if not username:
             LOGGER.info("User [%s] redirected to [/login], as not in session" % username)
             redirect('/beta1810/login?nextpage=%s' % dest)
 
-        role = request.get_cookie('role', '')
-        farm_cookie = 'all' if (role == 'admin') else request.get_cookie('farmname', '')
+        role = request.get_cookie('role', default='', secret=sessionutils.KEY)
+        farm_cookie = 'all' if (role == 'admin') else request.get_cookie('farmname', default='', secret=sessionutils.KEY)
         dest_parts = dest.split('/')
 
         if dest_parts[0] == 'edit':
@@ -234,8 +239,8 @@ def login_required(f):
 @get('/edit/<farm>')
 @login_required
 def editfarm(farm):
-    username = request.get_cookie('username')
-    role = request.get_cookie('role')
+    username = request.get_cookie('username', secret=sessionutils.KEY)
+    role = request.get_cookie('role', secret=sessionutils.KEY)
     content = datautils.get_farm_content(farm)
     instructions = json.load(open(os.path.join(DATA_DIR, 'farm-data-instructions.json'), 'rb'))
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
@@ -336,6 +341,7 @@ def editfarm_post(farm):
     datautils.delete_removed_imgs(farm, updated_content)
     datautils.update_farm_content(farm, updated_content)
     sessionutils.flash_message("Farm profile <b>%s</b> updated" % farm)
+    datautils.update_published_images()
     redirect('/beta1810/edit/%s' % farm)
 
 
@@ -356,7 +362,7 @@ def resetpassword_post():
     new_password = form.getlist("password")[0]
     salt = datautils.make_salt()
     hash = datautils.get_hash(new_password, salt)
-    username = request.get_cookie('username')
+    username = request.get_cookie('username', secret=sessionutils.KEY)
     permissions_dict = datautils.get_permissions_dict()
     permissions_dict['hashed_passwords'][username] = hash
     permissions_dict['password_salts'][username] = salt

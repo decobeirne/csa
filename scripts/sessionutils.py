@@ -1,5 +1,6 @@
 import bottle
 from collections import OrderedDict
+import logging
 import os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -15,6 +16,8 @@ LINKS = OrderedDict([
 
 REQ_FLASH_MSGS_READ = False
 
+KEY = open(os.path.join(SCRIPT_DIR, os.pardir, 'data', 'key.txt'), 'r').read().strip()
+
 
 def get_flash_messages():
     """
@@ -27,7 +30,7 @@ def get_flash_messages():
         # We haven't read the 'flash' messages from the request, i.e. in flash_message, so we will not have
         # written these into the response
         cookies = bottle.request.cookies
-        request_msg = bottle.request.get_cookie("flash")
+        request_msg = bottle.request.get_cookie('flash')
         if request_msg:
             msg = request_msg
         REQ_FLASH_MSGS_READ = True
@@ -51,7 +54,7 @@ def flash_message(msg):
     msgs = []
     if not REQ_FLASH_MSGS_READ:
         cookies = bottle.request.cookies
-        request_msg = bottle.request.get_cookie("flash")
+        request_msg = bottle.request.get_cookie('flash')
         if request_msg:
             msg = request_msg + '$' + msg
         REQ_FLASH_MSGS_READ = True
@@ -65,7 +68,6 @@ def flash_message(msg):
             written = True
     if not written:
         bottle.response.set_cookie('flash', msg, path='/')
-        bottle.response.set_cookie('foo', 'bar', path='/')
 
 
 def render_template(name, **kwargs):
@@ -76,9 +78,9 @@ def render_template(name, **kwargs):
     try:
         os.chdir(TPL_DIR)
         tpl = bottle.SimpleTemplate(source=open(name + '.tpl').read(), lookup=['.'])
-        username_cookie = bottle.request.get_cookie('username')
-        role_cookie = bottle.request.get_cookie('role')
-        farmname_cookie = bottle.request.get_cookie('farmname')
+        username_cookie = bottle.request.get_cookie('username', secret=KEY)
+        role_cookie = bottle.request.get_cookie('role', secret=KEY)
+        farmname_cookie = bottle.request.get_cookie('farmname', secret=KEY)
         root_rel_dir = '../' * (bottle.request.path.count('/') - 1) # E.g. '/foo' == 0 == '', '/foo/bar' == 1 == '../'
         kwargs.update(
             {'page_name': name,
@@ -93,12 +95,12 @@ def render_template(name, **kwargs):
         os.chdir(cwd)
 
 def clear_session():
-    bottle.response.set_cookie('farmname', '', path='/')
-    bottle.response.set_cookie('username', '', path='/')
-    bottle.response.set_cookie('role', '', path='/')
+    bottle.response.set_cookie('farmname', '', secret=KEY, path='/')
+    bottle.response.set_cookie('username', '', secret=KEY, path='/')
+    bottle.response.set_cookie('role', '', secret=KEY, path='/')
 
 
 def setup_session(username, role, farmname):
-    bottle.response.set_cookie('username', username, path='/')
-    bottle.response.set_cookie('role', role, path='/')
-    bottle.response.set_cookie('farmname', farmname, path='/')
+    bottle.response.set_cookie('username', username, secret=KEY, path='/')
+    bottle.response.set_cookie('role', role, secret=KEY, path='/')
+    bottle.response.set_cookie('farmname', farmname, secret=KEY, path='/')

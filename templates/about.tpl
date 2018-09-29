@@ -2,26 +2,26 @@
 
 <script>
 var setup = function() {
-    var slideFilenames = [
-        "Chickens, Dublin CSA.jpg",
-        "Farm work day, Dublin CSA, 2013.jpg",
-        "Farm work day, Dublin CSA, Spring 2017.jpg",
-        "img_20161008_133352777_hdr.jpg",
-        "IMG_20170715_124157.jpg",
-        "IMG_2616.jpg",
-        "IMG_5465.jpg",
-        "IMG_6165.jpg",
-        "IMG_6168.jpg",
-        "joelollie (2 of 6).jpeg",
-        ];
-    addSlideImgs("images/slideshow/", slideFilenames, showCaptions=false);
     setupSlideEvents();
 };
 window.onload = setup;
 </script>
 
-<div class="slideshow-container" style="height:18.75x;"></div>
 <h2>Who are we?</h2>
+<div class="slideshow-container" style="line-height: 25em;">
+    % is_first = True
+    % for (image, caption) in images:
+        % fig_class = 'class=show' if is_first else ''
+        % is_first = False
+        <figure {{fig_class}}>
+            <img src="{{root_rel_dir}}{{image}}" style="max-height: 25em;">
+            % if caption != '':
+                <figcaption>{{caption}}</figcaption>
+            % end
+        </figure>
+    % end
+    <span class="prev non-selectable">«</span><span class="next non-selectable">»</span><span class="pause non-selectable">pause</span>
+</div>
 <p>
 CSA Network Ireland is the national network for CSA farms, and aims to
 support and promote the activities of CSAs in Ireland. The Network
