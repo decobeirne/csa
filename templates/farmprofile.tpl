@@ -73,5 +73,4 @@ window.onload = setup;
         % end
         </div>
     </div>
-
 </div>

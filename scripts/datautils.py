@@ -21,11 +21,11 @@ def setup_logging():
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-#
+
 
 def get_farm_json_file(farmname):
     return os.path.join(DATA_DIR, '%s.json' % farmname)
-#
+
 
 def get_new_farm_content(farmname):
     json_file = get_farm_json_file('new-farm-template')
@@ -41,17 +41,17 @@ def get_farm_content(farmname):
     else:
         content = get_new_farm_content(farmname)
     return content
-#
+
 
 def update_farm_content(farmname, content):
     json_file = get_farm_json_file(farmname)
     LOGGER.info("Updated farm content [%s]" % json_file)
     json.dump(content, open(json_file, 'wb'), indent=4, sort_keys=True)
-#
+
 
 def get_imgs_dir(farmname):
     return os.path.join(IMAGES_DIR, 'uploads', farmname)
-#
+
 
 def save_img(farmname, image):
     imgs_dir = get_imgs_dir(farmname)
@@ -68,7 +68,7 @@ def save_img(farmname, image):
             dest_file.write(packet)
         dest_file.close()
     return dest_path
-#
+
 
 def delete_removed_imgs(farmname, updated_content):
     previous_content = get_farm_content(farmname)
@@ -80,28 +80,28 @@ def delete_removed_imgs(farmname, updated_content):
             LOGGER.info("Deleted img removed from farm profile [%s]" % abs_path)
         else:
             LOGGER.info("Removed img [%s] not on disk so did not not" % img)
-#
+
 
 def get_permissions_dict():
     return json.load(open(os.path.join(DATA_DIR, 'permissions.json'), 'rb'))
-#
+
 
 def update_permissions_dict(permissions_dict):
     LOGGER.info("Updated permissions database")
     json.dump(permissions_dict, open(os.path.join(DATA_DIR, 'permissions.json'), 'wb'), indent=4, sort_keys=True)
-#
+
 
 def _add_unique(entry, existing_list):
     existing_set = set(existing_list)
     existing_set.add(entry)
     return list(existing_set)
-#
+
 
 def delete_user(user, role, permissions_dict):
     permissions_dict[role].remove(user)
     permissions_dict['hashed_passwords'].pop(user)
     permissions_dict['password_salts'].pop(user)
-#
+
 
 def add_user(user, role, permissions_dict):
     permissions_dict[role] = _add_unique(user, permissions_dict[role])
@@ -111,7 +111,7 @@ def add_user(user, role, permissions_dict):
     permissions_dict['password_salts'][user] = salt
     if role == 'editor':
         permissions_dict['permissions'][user] = ''
-#
+
 
 def delete_farm(farm, permissions_dict):
     permissions_dict['farms'].remove(farm)
@@ -127,21 +127,21 @@ def delete_farm(farm, permissions_dict):
         LOGGER.critical("Deleted dict [%s] for farm [%s]" % (json_file, farm))
     else:
         LOGGER.info("Dict [%s] for farm [%s] not on disk so did not delete" % (json_file, farm))
-#
+
 
 def add_farm(farm, permissions_dict):
     permissions_dict['farms'] = _add_unique(farm, permissions_dict['farms'])
-#
+
 
 def make_salt():
     return uuid.uuid4().hex
-#
+
 
 def get_hash(password, salt):
     input = password + salt
     hash = hashlib.md5(input.encode())
     return hash.hexdigest()
-#
+
 
 def check_password(username, password):
     """
@@ -163,7 +163,7 @@ def check_password(username, password):
         else:
             LOGGER.debug("User [%s] not in db" % username)
     return False
-#
+
 
 def get_permissions(username):
     """
@@ -176,4 +176,3 @@ def get_permissions(username):
     role = 'admin' if username in permissions_dict['admins'] else 'editor' if username in permissions_dict['editors'] else ''
     farm = 'all' if role == 'admin' else permissions_dict['permissions'].get(username, '')
     return (role, farm)
-#

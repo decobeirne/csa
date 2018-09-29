@@ -38,21 +38,25 @@ import sessionutils
 @route('/home')
 def home():
     return sessionutils.render_template('home')
-#
+
 
 @route('/about')
 def about():
     return sessionutils.render_template('about')
-#
+
 
 @route('/contact')
 def contact():
     return sessionutils.render_template('contact')
-#
+
 
 @route('/resources')
 def resources():
     return sessionutils.render_template('resources')
+
+
+#
+# Farm profiles
 #
 
 def farmprofile(farm):
@@ -90,7 +94,7 @@ def farmprofile(farm):
         fixup_url=fixup_url,
         order_info_keys=order_info_keys,
         get_profile_image=get_profile_image)
-#
+
 
 def __route_farms():
     global PUBLISHED_FARMS
@@ -100,7 +104,7 @@ def __route_farms():
         if farm_content.get('publish', ['no'])[0] == 'yes':
             PUBLISHED_FARMS.append(farmname)
             route('/%s' % farmname, 'GET', partial(farmprofile, farmname))
-#
+
 
 @get('/farms')
 def farms():
@@ -124,7 +128,7 @@ def farms():
         permissions_dict=permissions_dict,
         get_farm_title=get_farm_title,
         get_farm_coords=get_farm_coords)
-#
+
 
 #
 # Login pages
@@ -134,7 +138,7 @@ def farms():
 def login_get():
     # A request for e.g. '/edit/dublin' will have been redirected to '/login?nextpage=edit/dublin'
     return sessionutils.render_template('login', nextpage=request.query.get('nextpage', ''))
-#
+
 
 @post('/login')
 def login_post():
@@ -179,7 +183,7 @@ def login_post():
         sessionutils.flash_message("Sign in for user <b>%s</b> failed. Please contact admin to check your permissions." % username)
         LOGGER.info("Sign in failed for user [%s]" % username)
         return sessionutils.render_template("login")
-#
+
 
 @route('/logout')
 def logout():
@@ -190,7 +194,7 @@ def logout():
         sessionutils.flash_message("Signed out user <b>%s</b> on %s" % (username, now))
         LOGGER.info("Signed out user '%s'" % username)
     redirect('/beta1810/home')
-#
+
 
 def login_required(f):
     @wraps(f)
@@ -221,33 +225,10 @@ def login_required(f):
 
         return f(*args, **kwargs)
     return decorated_function
-#
+
 
 #
-# Admin pages
-#
-
-@get('/resetpassword')
-@login_required
-def resetpassword():
-    return sessionutils.render_template('resetpassword')
-#
-
-@post('/resetpassword')
-@login_required
-def resetpassword_post():
-    form = cgi.FieldStorage()
-    new_password = form.getlist("password")[0]
-    salt = datautils.make_salt()
-    hash = datautils.get_hash(new_password, salt)
-    username = request.get_cookie('username')
-    permissions_dict = datautils.get_permissions_dict()
-    permissions_dict['hashed_passwords'][username] = hash
-    permissions_dict['password_salts'][username] = salt
-
-    datautils.update_permissions_dict(permissions_dict)
-    sessionutils.flash_message("Password for user <b>%s</b> reset" % username)
-    redirect('/beta1810/home')
+# Editor pages
 #
 
 @get('/edit/<farm>')
@@ -269,7 +250,7 @@ def editfarm(farm):
         instructions=instructions,
         data_layout=data_layout,
         format_instructions=format_instructions)
-#
+
 
 @post('/edit/<farm>')
 @login_required
@@ -356,7 +337,34 @@ def editfarm_post(farm):
     datautils.update_farm_content(farm, updated_content)
     sessionutils.flash_message("Farm profile <b>%s</b> updated" % farm)
     redirect('/beta1810/edit/%s' % farm)
+
+
 #
+# Admin pages
+#
+
+@get('/resetpassword')
+@login_required
+def resetpassword():
+    return sessionutils.render_template('resetpassword')
+
+
+@post('/resetpassword')
+@login_required
+def resetpassword_post():
+    form = cgi.FieldStorage()
+    new_password = form.getlist("password")[0]
+    salt = datautils.make_salt()
+    hash = datautils.get_hash(new_password, salt)
+    username = request.get_cookie('username')
+    permissions_dict = datautils.get_permissions_dict()
+    permissions_dict['hashed_passwords'][username] = hash
+    permissions_dict['password_salts'][username] = salt
+
+    datautils.update_permissions_dict(permissions_dict)
+    sessionutils.flash_message("Password for user <b>%s</b> reset" % username)
+    redirect('/beta1810/home')
+
 
 @get('/admin')
 @login_required
@@ -373,7 +381,7 @@ def admin():
         'admin',
         permissions_dict=permissions_dict,
         get_selected_farm=get_selected_farm)
-#
+
 
 @post('/admin')
 @login_required
@@ -434,7 +442,7 @@ def admin():
 
     datautils.update_permissions_dict(permissions_dict)
     redirect('/beta1810/admin')
-#
+
 
 #
 # Provide images and static files (scripts, css) to the browser using bottle.static_file.
@@ -447,12 +455,12 @@ def admin():
 @route('/images/<filepath:path>')
 def image(filepath):
     return static_file(filepath, root=IMAGES_DIR)
-#
+
 
 @route('/static/<filepath:path>')
 def static(filepath):
     return static_file(filepath, root=STATIC_DIR)
-#
+
 
 #
 # Run

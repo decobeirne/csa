@@ -96,13 +96,9 @@ def clear_session():
     bottle.response.set_cookie('farmname', '', path='/')
     bottle.response.set_cookie('username', '', path='/')
     bottle.response.set_cookie('role', '', path='/')
-#
+
 
 def setup_session(username, role, farmname):
     bottle.response.set_cookie('username', username, path='/')
     bottle.response.set_cookie('role', role, path='/')
     bottle.response.set_cookie('farmname', farmname, path='/')
-#
-
-
-
