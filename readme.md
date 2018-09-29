@@ -16,7 +16,7 @@ The content for each CSA is serialized to a json file under `data`, e.g. `dublin
 ----
 Copy the contents of `cgi-bin` to `/webspace/cgi-bin`.
 
-Copy everything else to `/webspace/httpdocs/communitysupportedagriculture.ie`. Change the text in `key.txt`, used for session management.
+Copy everything else to `/webspace/httpdocs/communitysupportedagriculture.ie`. Change the text in `key.txt`, used for session management. Also reset all passwords, as these are visible in `permissions.json`, which is public.
 
 The `.htaccess` file tells Apache to send any requests for a URL under `communitysupportedagriculture.ie` to `/cgi-bin/main.py`.
 
