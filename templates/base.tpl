@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <head>
-            <meta property='og:image' content='http://communitysupportedagriculture.ie/images/slideshow/leaf-and-root.jpg'/>
-        </head>
+        <title>Community Supported Agriculture Network Ireland</title>
+        <meta property="og:image" content="http://communitysupportedagriculture.ie/images/og-image.jpg"/>
+        <meta property="og:title" content="CSA Network Ireland"/>
+        <meta property="og:url" content="http://communitysupportedagriculture.ie"/>
+        <meta property="og:site_name" content="CSA Network Ireland"/>
+        <meta property="og:description" content="Community Supported Agriculture (CSA) Network Ireland"/>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
