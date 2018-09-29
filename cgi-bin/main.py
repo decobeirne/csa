@@ -296,13 +296,6 @@ def editfarm_post(farm):
         img = caption_key[8:]
         updated_content['captions'][img] = form.getfirst(caption_key, "")
 
-    # Set profile image, if selected
-    default_image_token = 'is-default-img-'
-    default_image_keys = [x for x in form_keys if x.startswith(default_image_token)]
-    if default_image_keys:
-        updated_content['default-image'] = default_image_keys[0][len(default_image_token):]
-    LOGGER.info("form keys %s" % str(form_keys))
-
     # If a checkbox is unchecked, it will not be present in form.keys
     for key in checkbox_inputs:
         if key in form_keys:

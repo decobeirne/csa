@@ -79,11 +79,6 @@ $(function () {
 });
 
 $(document).ready(function(){
-    // If an image is selected as the profile image, unset any previously selected image
-    $('form').on('click', '.is-default-image', function() {
-        $('.is-default-image').not(this).prop('checked', false);
-    });
-
     // Make inputs for adding a new key-value pair clickable
     $('.new-subkey').keypress(function (e) {
         var key = e.which;
@@ -230,9 +225,6 @@ $(document).ready(function(){
                             % checked = "checked" if (content.get('default-image', '') == item) else ""
                             <input type="text" name="{{key}}$existing" value="{{item}}" style="background-color:#e3ede9" readonly>
                             <img src="{{root_rel_dir}}{{item}}"/>
-                            <div class="edit-farm-align-right">
-                                <span class="edit-farm-control-no-hover">Select as profile image<input type="checkbox" class="is-default-image" name="is-default-img-{{item}}" {{checked}}/></span>
-                            </div>
                             % caption = captions.get(item, '')
                             <div>
                                 <span class="edit-farm-control-no-hover edit-farm-span-dont-expand">Caption</span>
