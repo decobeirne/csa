@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
+        <link href="scripts/csaireland-style.css" type="text/css" rel="stylesheet"/>
+        <script src="scripts/setup-links.js" type="text/javascript"></script>
+        <script>
+var mapTooltipDict = {
+    "cloughjordan": "Cloughjordan",
+    "derrybeg": "Derrybeg",
+    "dublin": "Dublin City",
+    "leafandroot": "Leaf and Root",
+    "moyhill": "Moy Hill",
+    "skerries": "Skerries"
+    };
+var mapPosDict = {
+    "cloughjordan": ["125", "193"],
+    "derrybeg": ["192", "161"],
+    "dublin": ["204", "164"],
+    "leafandroot": ["102", "172"],
+    "moyhill": ["66", "199"],
+    "skerries": ["209", "149"]
+    };
+var mapWidth;
+var mapTooltip;
+var mapTooltipBackground;
+var mapHome;
+var mapCircles;
+var mapContainer;
+var profileContainers;
+var miscContainers;
+
+var tooltipOffsety = 10;
+var tooltipMargin = 5;
+
+function getTargetFromEvt(evt) {
+    if (!evt) {
+        var evt = window.event;
+    }
+    var tar;
+    if (evt.target) {
+        tar = evt.target;
+    } else if (evt.srcElement) {
+        tar = evt.srcElement;
+    }
+    return tar;
+}
+
+function positionTooltip(evtx, evty) {
+    mapTooltip.setAttributeNS(null, "display", "block");  // Need to display before calculating bbox
+
+    var bbox = mapTooltip.getBBox();
+    var length = bbox.width;
+    var height = bbox.height;
+    var margin = (length + 5) / 2;
+    var destx = Math.min(Math.max(tooltipMargin, evtx - margin), (mapWidth - tooltipMargin) - margin);
+    var desty;
+    if (evty < 50) {
+        desty = evty + tooltipOffsety + height;
+    } else {
+        desty = evty - tooltipOffsety;
+    }
+    
+    mapTooltip.setAttributeNS(null, "x", destx);
+    mapTooltip.setAttributeNS(null, "y", desty);
+    
+    mapTooltipBackground.setAttributeNS(null, "width", length + 5);
+    mapTooltipBackground.setAttributeNS(null, "height", height + 2);
+    mapTooltipBackground.setAttributeNS(null, "x", destx - 2);
+    mapTooltipBackground.setAttributeNS(null, "y", (desty - height) + 2);
+    
+    mapTooltipBackground.setAttributeNS(null, "display", "block");
+}
+
+function showToolTip(evt) {
+    var tar = getTargetFromEvt(evt);
+    var id = tar.id.replace("-circle", "");
+    var name;
+    if (id in mapTooltipDict) {
+        name = mapTooltipDict[id];
+    } else {
+        return;
+    }
+    mapTooltip.firstChild.data = name;
+
+    positionTooltip(parseInt(tar.getAttribute("cx")), parseInt(tar.getAttribute("cy")));
+}
+
+function hideToolTip(evt) {
+    mapTooltip.setAttributeNS(null, "display", "none");
+    mapTooltipBackground.setAttributeNS(null, "display", "none");
+}
+
+function showProfile(id) {
+    var container = document.getElementById(id + "-desc-container");
+    if (container) {
+        for (i = 0; i < profileContainers.length; i++) {
+            profileContainers[i].style.display = "none";
+        }
+        
+        if (id == 'home') {
+            container.style.width = "40%";
+            mapContainer.style.width = "60%";
+        } else {
+            container.style.width = "60%";
+            mapContainer.style.width = "40%";
+        }
+        
+        for (i = 0; i < mapCircles.length; i++) {
+            mapCircles[i].setAttribute("class", "map-circle");
+        }
+        
+        for (i = 0; i < miscContainers.length; i++) {
+            miscContainers[i].style.display = "none";
+        }
+        
+        if (id == 'home') {
+            mapHome.setAttributeNS(null, "display", "none");
+        } else {
+            mapHome.setAttributeNS(null, "display", "block");
+            
+            var circle = document.getElementById(id + "-circle");
+            if (circle) {
+                circle.setAttribute("class", "map-circle map-circle-active");
+            }
+            
+            var miscContainer = document.getElementById(id + "-misc-container");
+            miscContainer.style.display = "block";
+        }
+        container.style.display = "block";
+    }
+}
+
+function showProfileEvt(evt) {
+    var tar = getTargetFromEvt(evt);
+    showProfile(tar.id.replace("-circle", ""));
+}
+
+function resetProfiles(evt) {
+    showProfile('home')
+}
+
+function setupMap() {
+    var map = document.getElementById("map-svg");
+    var ns = "http://www.w3.org/2000/svg";
+    var colour = "#504416";  // brown
+    for (var i = 0; i < profileContainers.length; i++) {
+        var id = profileContainers[i].id.replace("-desc-container", "");
+        var pos = mapPosDict[id];
+        if (pos) {
+            var circle = document.createElementNS(ns, "circle");
+            circle.setAttribute("class", "map-circle");
+            circle.setAttribute("id", id + "-circle");
+            circle.setAttributeNS(null, "cx", pos[0]);
+            circle.setAttributeNS(null, "cy", pos[1]);
+            circle.setAttributeNS(null, "r", 3);
+            circle.addEventListener('click', showProfileEvt, true);
+            circle.addEventListener('mouseenter', showToolTip, true);
+            circle.addEventListener('mouseleave', hideToolTip, true);
+            map.appendChild(circle);
+        }
+    }
+    
+    var home = document.createElementNS(ns, "text");
+    home.setAttribute("id", 'map-home');
+    home.setAttribute("class", 'non-selectable map-link');
+    home.setAttributeNS(null, "x", '20');
+    home.setAttributeNS(null, "y", '30');
+    home.textContent = "RESET";
+    home.addEventListener('click', resetProfiles, true);
+    map.appendChild(home);
+    
+    // Add tooltip after adding circles s.th. it is drawn on top
+    var bg = document.createElementNS(ns, "rect");
+    bg.setAttribute("id", 'map-tooltip-background');
+    bg.setAttribute("class", "tooltip-background");
+    bg.setAttributeNS(null, "x", '0');
+    bg.setAttributeNS(null, "y", '0');
+    bg.setAttributeNS(null, "rx", '4');
+    bg.setAttributeNS(null, "ry", '4');
+    bg.setAttributeNS(null, "width", '100');
+    bg.setAttributeNS(null, "height", '10');
+    bg.setAttributeNS(null, "display", 'none');
+    map.appendChild(bg);
+    
+    var tt = document.createElementNS(ns, "text");
+    tt.setAttribute("id", 'map-tooltip');
+    tt.setAttribute("class", "map-text");
+    tt.setAttributeNS(null, "x", '0');
+    tt.setAttributeNS(null, "y", '0');
+    tt.setAttributeNS(null, "display", 'none');
+    tt.textContent = "Map";
+    map.appendChild(tt);
+}
+
+function setupProfilePage() {
+    mapWidth = document.getElementById("map-svg").viewBox.baseVal.width;
+    mapContainer = document.getElementById("home-info-container")
+    profileContainers = document.getElementsByClassName("profile-desc-container");
+    miscContainers = document.getElementsByClassName("profile-misc-container");
+    
+    setupMap();
+    mapCircles = document.getElementsByClassName("map-circle");
+    mapTooltip = document.getElementById("map-tooltip");
+    mapTooltipBackground = document.getElementById("map-tooltip-background");
+    mapHome = document.getElementById("map-home");
+    
+    setupLinks();
+    showProfile("home");
+}
+
+window.onload = setupProfilePage;
+</script>
+    </head>
+    <body>
+        <div id="top-level-container">
+            <div id="banner-container-top">
+                <img class="banner-img" src="images/veg-header.png"/>
+            </div>
+            <div id="heading-container">
+                <h1>CSA Network Ireland</h1>
+            </div>
+            <div id="links-container"></div>
+            <div class="body-container">
+                <div class="profile-top-container" >
+                    <div class="profile-flex-container">
+                        <div class="profile-info-container" id="home-info-container" style="margin-top:40px;">
+                            
+                            <div style="position:relative;margin-bottom:40px">
+                                <canvas class="dummy-canvas" width="253.38666" height="317.33331"></canvas>
+                                <svg id="map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 253.38666 317.33331" preserveAspectRatio="xMaxYMax meet">
+                                    <image id="map-img" width="253.38666" height="317.33331" xlink:href="images/map/map-all-blank-no-dots-no-frame-fill.svg"></image>
+                                </svg>
+                            </div>
+                            
+                            <div class="profile-misc-container" id="cloughjordan-misc-container">
+                                <p>
+                                    <span class="profile-info-key">Website</span>
+                                    <br>
+                                    <span class="profile-info-value"><a href="http://cloughjordancommunityfarm.ie">cloughjordancommunityfarm.ie</a></span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Email</span>
+                                    <br>
+                                    <span class="profile-info-value">info@cloughjordancommunityfarm.ie</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Address</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Cloughjordan Community Farm,<br>
+                                    The Eco Village,<br>
+                                    Cloughjordan,<br>
+                                    County Tipperary
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">CSA pickup location</span>
+                                    <br>
+                                    <span class="profile-info-value">Cloughjordan Eco Village</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Farmers</span>
+                                    <br>
+                                    <span class="profile-info-value">Pat Malone and Kevin Dudley</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Contact phone</span>
+                                    <br>
+                                    <span class="profile-info-value">087 7910149</span>
+                                </p>
+                            </div>
+                            
+                            <div class="profile-misc-container" id="derrybeg-misc-container">
+                                <p>
+                                    <span class="profile-info-key">Website</span>
+                                    <br>
+                                    <span class="profile-info-value"><a href="http://derrybegfarm.ie">derrybegfarm.ie</a></span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Email</span>
+                                    <br>
+                                    <span class="profile-info-value">info@derrybegfarm.ie</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Address</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Maynooth Road, Celbridge<br>
+                                    Opposite Salesians college,<br>
+                                    next to the new Community School.
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">CSA pickup location</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Celbridge (at the farm) and Maynooth<br>
+                                    (by arrangement with other members)
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Farmer</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Nathan Jackson<br>
+                                    087 6195518
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Business manager</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Liam O’Toole<br>
+                                    085 7117358
+                                    </span>
+                                </p>
+                            </div>
+                            
+                            <div class="profile-misc-container" id="dublin-misc-container">
+                                <p>
+                                    <span class="profile-info-key">Website</span>
+                                    <br>
+                                    <span class="profile-info-value"><a href="https://csadublin.wordpress.com/">csadublin.wordpress.com</a></span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Email</span>
+                                    <br>
+                                    <span class="profile-info-value">csadublin@gmail.com</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Address</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Cellbridge, County Kildare
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">CSA pickup location</span>
+                                    <br>
+                                    <span class="profile-info-value">Smithfield, Dublin</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Farmers</span>
+                                    <br>
+                                    <span class="profile-info-value">Seamus Bradley and Stuart Davis</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Contact phone</span>
+                                    <br>
+                                    <span class="profile-info-value">087 9903139</span>
+                                </p>
+                            </div>
+                            
+                            <div class="profile-misc-container" id="leafandroot-misc-container">
+                                <p>
+                                    <span class="profile-info-key">Website</span>
+                                    <br>
+                                    <span class="profile-info-value"><a href="http://www.leafandroot.org">www.leafandroot.org</a></span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Email</span>
+                                    <br>
+                                    <span class="profile-info-value">leafandrootinfo@gmail.com</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Address</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Leaf and Root Farm,<br>
+                                    Kilmeen, Loughrea,<br>
+                                    County Galway, Ireland
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Farmers</span>
+                                    <br>
+                                    <span class="profile-info-value">Fergal Anderson, Emanuela Russo</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Contact phone</span>
+                                    <br>
+                                    <span class="profile-info-value">087 7806155</span>
+                                </p>
+                            </div>
+                            
+                            <div class="profile-misc-container" id="moyhill-misc-container">
+                                <p>
+                                    <span class="profile-info-key">Website</span>
+                                    <br>
+                                    <span class="profile-info-value"><a href="http://www.moyhillfarm.com">www.moyhillfarm.com</a></span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Email</span>
+                                    <br>
+                                    <span class="profile-info-value">moyhillfarm@gmail.com</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Address</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Moy Hill, Moy,<br>
+                                    Lahinch,<br>
+                                    Co. Clare
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Farmers</span>
+                                    <br>
+                                    <span class="profile-info-value">Matt Smith, Fergal Smith, Mitch Corbett</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Contact phone</span>
+                                    <br>
+                                    <span class="profile-info-value">087 1301937</span>
+                                </p>
+                            </div>
+                            
+                            <div class="profile-misc-container" id="skerries-misc-container">
+                                <p>
+                                    <span class="profile-info-key">Website</span>
+                                    <br>
+                                    <span class="profile-info-value"><a href="http://skerrieschg.wordpress.com">skerrieschg.wordpress.com</a></span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Email</span>
+                                    <br>
+                                    <span class="profile-info-value">sustskerries@yahoo.ie</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Address</span>
+                                    <br>
+                                    <span class="profile-info-value">
+                                    Skerries, North County Dublin
+                                    </span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">CSA pickup location</span>
+                                    <br>
+                                    <span class="profile-info-value">At the farm or Skerries Mills</span>
+                                </p>
+                                <p>
+                                    <span class="profile-info-key">Farmers</span>
+                                    <br>
+                                    <span class="profile-info-value">Paddy Byrne</span>
+                                </p>
+                            </div>
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                        <div class="profile-desc-container" id="home-desc-container" style="margin-top:40px;">
+                            <p>
+This page profiles some CSA farms in Ireland. There are up to ten active CSA farms known to us.
+                            </p>
+                        </div>
+                        
+                        <div class="profile-desc-container" id="cloughjordan-desc-container">
+                            <h2>Cloughjordan Community Farm</h2>
+                            <div class="profile-img-container">
+                                <img src="images/new-profile/profile-cloughjordan.jpg"/>
+                            </div>
+                            <p>
+Community Supported Farms improve the quality and quantity of food available locally while reducing
+the environmental impact of producing this food. Our farm is co-owned by the members. Members pay a
+regular contribution to cover administration, running costs and wages of our growers. In return we
+all receive a regular supply of farm fresh vegetables in season, delivered 3 times a week to a central
+collection point. We also arrange regular farm walks, as well as training and educational events. If
+you can collect your produce in Cloughjordan, you’re eligible to be a member – it's as simple as that!
+Our pricing structure means being a member and sharing all this quality produce is affordable for
+everyone.
+                            </p>
+                            <p>
+The farmers are Pat Malone and Kevin Dudley, helped by woofers. Pat Malone
+graduated from Horticulture College in 1989 and began his own commercial enterprise as a conventional
+vegetable grower. After ten years it was clear to him that this way of farming was too hard on the
+land and intense on the soul. He took a career break and spent six years working with Irish Seeds
+Savers Association as a researcher and collector of heritage fruit trees, mainly apples. There he
+deepened his love and understanding of the natural rhythms and cycles of nature. He also developed
+a passion and fascination with the world of Bio Dynamics and later with horses. He moved to
+Cloughjordan in 2007 and was instrumental in setting up the community farm. Then, having completed
+his own house build in the ecovillage he took over as field scale vegetable farmer in 2011.
+                            </p>
+                        </div>
+                        
+                        <div class="profile-desc-container" id="derrybeg-desc-container">
+                            <h2>Derrybeg Farm</h2>
+                            <div class="profile-img-container">
+                                <img src="images/new-profile/profile-derrybeg.png"/>
+                            </div>
+                            <p>
+Derrybeg farm uses a certain CSA model where the farmer
+works the land and the consumers become members of the
+farm, committing to pay in advance a certain amount of
+money, for an agreed period of time. The members’ money
+provides a modest income for the farmer and covers the
+day-to-day running costs of the farm. In return, the members
+receive food, usually a box of vegetables per week with
+occasional options for eggs and meat. Various grants and
+fundraising events are another source of income for the
+farm. It also has social members that pay a nominal fee to
+avail of the social aspects of the farm but not receive its
+produce. There is a steering group of six people (including
+the farmer) who represent the membership in overseeing the
+overall planning and logistics of the organisation. Alongside
+growing a wide variety of organic vegetables the farm also
+rears pigs and ducks. Members and volunteers help the
+farmer with his work on a regular basis. The farm holds
+various social, cultural and educational events such as music
+sessions, pot-luck food lunches, bonfires, creative art
+instalments, and biodiversity talks and activities. Nathan
+Jackson is the farmer. The land is rented from Kildare
+County Council on a short-term lease.
+                            </p>
+                        </div>
+                        
+                        <div class="profile-desc-container" id="dublin-desc-container">
+                            <h2>Dublin CSA</h2>
+                            <div class="profile-img-container">
+                                <img src="images/new-profile/profile-dublin.jpg"/>
+                            </div>
+                            <p>
+Dublin CSA has been created in 2012 by a few people passionate about community farming. Since it has started,
+Seamus, our primary farmer, has been growing vegetables for Dublin CSA, itself growing from about 10 to 35
+members today.
+                            </p>
+                            <p>
+We offer full share (weekly collection) or half share (bi-weekly collection) from June to February, each
+collection including 5 varieties in average. Seamus bring the vegetables to Smithfield on Thursdays between
+18:30 and 19:00 and as we aim to reduce packaging, members are expected to come with their own bag/container.
+                            </p>
+                            <p>
+For us, CSA is more than a way to feed you with healthy, natural and local food. It is commitment, learning
+and community engagement. Members voluntarily carry out the coordination of the CSA (membership,
+communication, events). Throughout the season, there are also additional and entirely voluntary opportunities
+to get to know fellow members better and have fun on the farm.
+                            </p>
+                            <p>
+With our project at Seamus’s farm, we try to find out how to make it practical for us, how to make it work.
+It is an ongoing process of learning, experiencing and discovering
+                            </p>
+                        </div>
+                        
+                        <div class="profile-desc-container" id="leafandroot-desc-container">
+                            <h2>Leaf and Root Farm</h2>
+                            <div class="profile-img-container">
+                                <!-- <img src="images/new-profile/profile-leafandroot.jpg"/> -->
+                                <img src="images/new-profile/fergal and manu.jpg"/>
+                            </div>
+                            <p>
+Our CSA has been running since 2015.  Our season runs from June until December.  We also sell in
+the Loughrea market on Thursday mornings during the season and supply Loam restaurant in Galway
+year-round.
+                            </p>
+                            <p>
+Growing food takes time, effort and plenty of work but we’ve been building slowly and steadily
+since we first started the farm in 2012. 
+                            </p>
+                            <p>
+Our aim is to produce healthy and affordable food for the local community and assure a livelihood
+for ourselves – we are also interested in fruit production and have an orchard for apples as well
+as a soft fruit area.
+                            </p>
+                        </div>
+                        
+                        <div class="profile-desc-container" id="moyhill-desc-container">
+                            <h2>Moy Hill Farm</h2>
+                            <div class="profile-img-container">
+                                <img src="images/new-profile/profile-moyhill.jpg"/>
+                            </div>
+                            <p>
+Each Friday (in harvest season) morning, we - those living and working at moy hill farm - get up extra early for the
+harvest. By mid afternoon the work is done; our timber packing shed full of amazing, healing, potent vegetables. 50
+families will receive a box each; more will change hands at the market. Our mission is to feed local people, love earth
+and inspire. To progress in that direction we have and continue to work with whatever is necessary - soil, seeds, shovels
+and long days in the field; farmers, banks, politics (Fergal stood for election last year), NGOs, charities, schools
+and universities; as well as yoga, meditation, non-violent communication and community building practices. We grow
+food but also hold an open door for anyone to stay, work, learn, grow, heal.
+                            </p>
+                        </div>
+                        
+                        <div class="profile-desc-container" id="skerries-desc-container">
+                            <h2>Skerries Community Harvest</h2>
+                            <div class="profile-img-container">
+                                <img src="images/new-profile/profile-skerries.jpg"/>
+                            </div>
+                            <p>
+Skerries Community Harvest Group (CHG) was launched by Sustainable Skerries in North County Dublin.
+This is a Community Supported Agriculture (CSA) scheme. It is a partnership between the people and
+the grower where we all work together to provide healthy, local food for our families and our
+community. This partnership allows us to share both the rewards and also the challenges that
+our independent farmers face every year. CSAs are a relatively new concept in Ireland but they
+have been working wonderfully in USA, Canada and in Europe for many years. By joining, we as
+members become a part of where our food comes from. Each member pays a set monthly fee, and in
+return you receive a weekly box of locally grown, freshly picked organic vegetables. As a member
+you can also visit the farm on Member’s Day to walk the land, learn about the vegetables being
+grown or even  help with the harvest. A newsletter is sent out regularly keeping you involved
+in the daily happenings on the farm and recipes. By forming CSA’s we strenghten our community’s
+links to the land. The CSA allows everyone the opportunity to have access to a resilient, local
+and healthy food supply.
+                            </p>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                
+            </div>
+            <div id="banner-container-bottom">
+                <img class="banner-img" src="images/veg-footer.png"/>
+            </div>
+        </div>
+    </body>
+</html>
