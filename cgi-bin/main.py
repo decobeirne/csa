@@ -14,7 +14,7 @@ from bottle import route, get, post, run, request, response, template, SimpleTem
 
 LOGGER = logging.getLogger("csa")
 
-ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie/beta1810')
+ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie')
 DATA_DIR = ROOT_DIR + '/data'
 IMAGES_DIR = ROOT_DIR + '/images'
 SCRIPTS_DIR = ROOT_DIR + '/scripts'
@@ -168,7 +168,7 @@ def login_post():
             # E.g. '/admin' or '/edit/dublin'
             # Admins have access to edit any farm profile, so not necessary to check.
             LOGGER.info("User [%s] signed in as admin redirecting to [%s]" % (username, nextpage))
-            redirect('/beta1810/%s' % nextpage)
+            redirect('/%s' % nextpage)
         else:
             next_parts = nextpage.split('/')
             # Editors are associated with a particular farm, or no farm, os necessary to check if this matches
@@ -176,18 +176,18 @@ def login_post():
             if len(next_parts) == 2 and next_parts[0] == 'edit':
                 if next_parts[1] == assigned_farm:
                     LOGGER.info("User [%s] signed in and access granted to [%s]" % (username, nextpage))
-                    redirect('/beta1810/%s' % nextpage)
+                    redirect('/%s' % nextpage)
                 else:
                     sessionutils.flash_message("Redirected. No access to requested page")
                     LOGGER.info("User [%s] signed in but requested access to [%s] which doesn't match user's farm [%s] so redirecting" % (username, nextpage, assigned_farm))
-                    redirect('/beta1810/home')
+                    redirect('/home')
             else:
                 LOGGER.info("User [%s] signed in but didn't request [/edit/<some farm>] so redirecting to home" % username)
-                redirect('/beta1810/home')
+                redirect('/home')
     else:
         sessionutils.flash_message("Sign in for user <b>%s</b> failed. Please contact admin to check your permissions." % username)
         LOGGER.info("Sign in failed for user [%s]" % username)
-        return sessionutils.render_template("login")
+        return sessionutils.render_template('login', nextpage='')
 
 
 @route('/logout')
@@ -198,7 +198,7 @@ def logout():
         now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         sessionutils.flash_message("Signed out user <b>%s</b> on %s" % (username, now))
         LOGGER.info("Signed out user '%s'" % username)
-    redirect('/beta1810/home')
+    redirect('/home')
 
 
 def login_required(f):
@@ -208,7 +208,7 @@ def login_required(f):
         username = request.get_cookie('username', default='', secret=sessionutils.KEY)
         if not username:
             LOGGER.info("User [%s] redirected to [/login], as not in session" % username)
-            redirect('/beta1810/login?nextpage=%s' % dest)
+            redirect('/login?nextpage=%s' % dest)
 
         role = request.get_cookie('role', default='', secret=sessionutils.KEY)
         farm_cookie = 'all' if (role == 'admin') else request.get_cookie('farmname', default='', secret=sessionutils.KEY)
@@ -219,14 +219,14 @@ def login_required(f):
             if farm_cookie != 'all' and farm_cookie != dest_parts[1]:
                 sessionutils.flash_message("Redirected. Do not have permission to edit farm profile %s" % dest_parts[1])
                 LOGGER.info("User [%s] with farm permission [%s] denied access to [/edit/%s] so redirected" % (username, farm_cookie, dest_parts[1]))
-                redirect('/beta1810/farms')
+                redirect('/farms')
 
         elif dest_parts[0] == 'admin':
             # I.e. '/admin'
             if role != 'admin':
                 sessionutils.flash_message("Redirected. Do not have admin permission")
                 LOGGER.info("User [%s] with role [%s] denied access to [/admin] so redirected" % (username, role))
-                redirect('/beta1810/farms')
+                redirect('/farms')
 
         return f(*args, **kwargs)
     return decorated_function
@@ -335,7 +335,7 @@ def editfarm_post(farm):
     datautils.update_farm_content(farm, updated_content)
     sessionutils.flash_message("Farm profile <b>%s</b> updated" % farm)
     datautils.update_published_images()
-    redirect('/beta1810/edit/%s' % farm)
+    redirect('/edit/%s' % farm)
 
 
 #
@@ -362,7 +362,7 @@ def resetpassword_post():
 
     datautils.update_permissions_dict(permissions_dict)
     sessionutils.flash_message("Password for user <b>%s</b> reset" % username)
-    redirect('/beta1810/home')
+    redirect('/home')
 
 
 @get('/admin')
@@ -440,7 +440,7 @@ def admin():
         LOGGER.info("Added farm [%s]" % new_farm)
 
     datautils.update_permissions_dict(permissions_dict)
-    redirect('/beta1810/admin')
+    redirect('/admin')
 
 
 #
