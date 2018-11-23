@@ -16,6 +16,7 @@ LOGGER = logging.getLogger("csa")
 
 ROOT_DIR = os.path.abspath('../httpdocs/communitysupportedagriculture.ie')
 DATA_DIR = ROOT_DIR + '/data'
+DOWNLOADABLE_DIR = ROOT_DIR + '/downloadable'
 IMAGES_DIR = ROOT_DIR + '/images'
 SCRIPTS_DIR = ROOT_DIR + '/scripts'
 STATIC_DIR = ROOT_DIR + '/static'
@@ -459,6 +460,11 @@ def image(filepath):
 @route('/static/<filepath:path>')
 def static(filepath):
     return static_file(filepath, root=STATIC_DIR)
+
+
+@route('/downloadable/<filepath:path>')
+def static(filepath):
+    return static_file(filepath, root=DOWNLOADABLE_DIR)
 
 
 #
