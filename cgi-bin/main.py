@@ -463,8 +463,12 @@ def static(filepath):
 
 
 @route('/downloadable/<filepath:path>')
-def static(filepath):
+def downloadable(filepath):
     return static_file(filepath, root=DOWNLOADABLE_DIR)
+
+@route('/favicon.ico')
+def icon():
+    return static_file('favicon.ico', root=ROOT_DIR)
 
 
 #
