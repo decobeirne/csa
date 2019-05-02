@@ -107,6 +107,19 @@ $(document).ready(function(){
         addCircle(circleX, circleY);
     });
     
+    $('.edit-farm-coords-text').keypress(function (e) {
+        // If enter key is pressed, then update coords in SVG map,
+        // and store in ??????
+    });
+    $('.edit-farm-coords-text').on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            // If enter key is pressed, then update coords in SVG map,
+            // and store in ??????
+            
+            
+        }
+    });
+    
     % coords = content.get('coords', [''])[0].split(',')
     % if len(coords) == 2:
         addCircle({{coords[0]}}, {{coords[1]}});

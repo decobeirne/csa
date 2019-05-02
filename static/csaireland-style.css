@@ -132,15 +132,20 @@ p.footnote {
     padding-top: 1.25em;  /* Extra padding above a footnote */
 }
 
-.body-container p, .body-container ol, .bodycontainer input {
+.body-container p, .bodycontainer input {
     padding-left: 3em;
     padding-right: 3em;
     padding-bottom:  1.25em;
     text-align: justify;
 }
 
+.body-container ol, .body-container ul {
+    padding-left: 4em;
+    padding-right: 4em;
+}
+
 @media only screen and (max-device-width: 800px) {
-    .body-container p, .body-container ol, .bodycontainer input {
+    .body-container p, .body-container ol, .body-container ul, .bodycontainer input {
         padding-left: 1em;
         padding-right: 1em;
     }
@@ -266,7 +271,7 @@ a:hover {
 
 .profile-info-key {
     font-family: "Playfair Display";
-    font-weight: bold;
+    font-weight: 500;
     font-size: 1.1em;
     color: #2A5D4C;
 }
@@ -319,7 +324,7 @@ h2 {
 h3, .edit-farm-key {
     font-family: "Playfair Display";
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: 500;
     color: #2A5D4C;
     margin-bottom: 0em;
 }
@@ -330,7 +335,7 @@ u {  /* Changes the behaviour of <u></u> tags. */
 }
 
 /* p, ol, form */
-p, ol, textarea, input {
+p, ol, ul, textarea, input {
     font-family: "Work Sans";
     font-size: 1em;
     color: #484B49;
