@@ -98,8 +98,8 @@ $(document).ready(function(){
         var evtRelY = e.pageY - offset.top;
         var canvas = $('.dummy-canvas');
         var canvasElem = canvas[0];
-        var circleX = (evtRelX / canvasElem.clientWidth) * 253.38666;
-        var circleY = (evtRelY / canvasElem.clientHeight) * 317.33331;
+        var circleX = (evtRelX / canvasElem.clientWidth) * {{map_settings['image-dimensions'][0]}};
+        var circleY = (evtRelY / canvasElem.clientHeight) * {{map_settings['image-dimensions'][1]}};
 
         var input = $('#editfarm-coords-container').children('input:first');
         input.val(circleX + ',' + circleY);
@@ -157,12 +157,14 @@ $(document).ready(function(){
 
             %if key == 'coords':
             <div class="edit-farm-coords-container" id="editfarm-coords-container">
-                <!-- These are the hard-coded dimensions of the SVG map we're using :( -->
+                <!-- The exact dimensions of the SVG map are required to display and scale correctly. -->
+                <!-- These should be written into the json file from which map_settings is read. -->
+                % dimensions = map_settings['image-dimensions']
                 <div class="edit-farm-coords-svg-container svg-container">
                     <!-- The canvas is required to make resizing the SVG work on IE -->
-                    <canvas class="dummy-canvas" width="253.38666" height="317.33331"></canvas>
-                    <svg id="edit-farm-map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 253.38666 317.33331" preserveAspectRatio="xMaxYMax meet">
-                        <image id="edit-farm-map-img" width="253.38666" height="317.33331" xlink:href="{{root_rel_dir}}images/map/map-all-blank-no-dots-no-frame-fill.svg"></image>
+                    <canvas class="dummy-canvas" width="{{dimensions[0]}}" height="{{dimensions[1]}}"></canvas>
+                    <svg id="edit-farm-map-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewbox="0 0 {{dimensions[0]}} {{dimensions[1]}}" preserveAspectRatio="xMaxYMax meet">
+                        <image id="edit-farm-map-img" width="{{dimensions[0]}}" height="{{dimensions[1]}}" xlink:href="{{root_rel_dir}}images/map/{{map_settings['image-filename']}}"></image>
                     </svg>
                 </div>
 

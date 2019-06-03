@@ -22,11 +22,13 @@ SCRIPTS_DIR = ROOT_DIR + '/scripts'
 STATIC_DIR = ROOT_DIR + '/static'
 TMP_DIR = ROOT_DIR + '/tmp'
 
-if SCRIPTS_DIR not in sys.path:
-    sys.path.append(SCRIPTS_DIR)
+MAP_SETTINGS_FILE = 'map-ireland.json'  # Expected to be under DATA_DIR
 
 PUBLISHED_FARMS = []
 MAX_IMAGES_IN_SLIDESHOW = 15
+
+if SCRIPTS_DIR not in sys.path:
+    sys.path.append(SCRIPTS_DIR)
 
 import datautils
 import sessionutils
@@ -84,6 +86,7 @@ def farmprofile(farm):
         for key in required_keys:
             keys.insert(0, key)
         return keys
+
     def get_profile_image(content):
         default = content.get('default-image', '')
         images = content.get('images', [])
@@ -91,12 +94,14 @@ def farmprofile(farm):
 
     farm_content = datautils.get_farm_content(farm)
     captions = farm_content.get('captions', {})
+    map_settings = json.load(open(os.path.join(DATA_DIR, MAP_SETTINGS_FILE), 'rb'))
 
     return sessionutils.render_template(
         'farmprofile',
         farm=farm,
         farm_content=farm_content,
         captions=captions,
+        map_settings=map_settings,
         fixup_url=fixup_url,
         order_info_keys=order_info_keys,
         get_profile_image=get_profile_image)
@@ -121,6 +126,7 @@ def farms():
         farm_content = datautils.get_farm_content(farmname)
         titles[farmname] = farm_content['title'][0]
         coords[farmname] = farm_content.get('coords', [''])[0].split(',')
+    map_settings = json.load(open(os.path.join(DATA_DIR, MAP_SETTINGS_FILE), 'rb'))
 
     def get_farm_title(farmname):
         return titles.get(farmname, farmname.capitalize())
@@ -132,6 +138,7 @@ def farms():
         'farms',
         published_farms=PUBLISHED_FARMS,
         permissions_dict=permissions_dict,
+        map_settings=map_settings,
         get_farm_title=get_farm_title,
         get_farm_coords=get_farm_coords)
 
@@ -245,6 +252,7 @@ def editfarm(farm):
     content = datautils.get_farm_content(farm)
     instructions = json.load(open(os.path.join(DATA_DIR, 'farm-data-instructions.json'), 'rb'))
     data_layout = json.load(open(os.path.join(DATA_DIR, 'farm-data-layout.json'), 'rb'))
+    map_settings = json.load(open(os.path.join(DATA_DIR, MAP_SETTINGS_FILE), 'rb'))
 
     def format_instructions(instructions):
         return '<br>'.join("<i class='fa fa-info-circle'></i> %s" % x for x in instructions)
@@ -255,6 +263,7 @@ def editfarm(farm):
         content=content,
         instructions=instructions,
         data_layout=data_layout,
+        map_settings=map_settings,
         format_instructions=format_instructions)
 
 
