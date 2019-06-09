@@ -1,38 +1,50 @@
 {
-    "captions": {}, 
-    "coords": [
-        "211.12108096086743,189.10991517287235"
+    "captions": {
+        "images/uploads/hazelanddavi/close-up-vegetables-wicklow-farm-1568x1176.jpg": "Hazel and Davi's Farm: Here is one of our veggie boxes from 2018"
+    }, 
+    "coordinates": [
+        "52.98327693816198,-6.105078171438021"
     ], 
     "description": [
-        "Description coming soon"
+        "We are a couple \u2013 Hazel Nairn and Davi Leon \u2013 living in Ashford- Wicklow, dedicating ourselves to regenerating our landscape through farming.\r\nWe produce chemical-free veggie boxes through a Community Supported Agriculture (CSA) scheme. Basically you will get your veggie boxes weekly by subscribing at the start of the season. Our main season runs from 15th June to 26th October (20 weeks). "
     ], 
-    "images": [], 
+    "images": [
+        "images/uploads/hazelanddavi/close-up-vegetables-wicklow-farm-1568x1176.jpg"
+    ], 
     "info": {
         "Address": [
             "Ballardbeg, Co. Wicklow"
         ], 
         "CSA pickup location": [
-            "At the farm", 
-            "Collection points"
+            "At the farm: farm in Ashford every Saturday between 10am and 2pm"
         ], 
         "Contact phone": [
             "0899893857"
         ], 
         "Email": [
-            "poncedavi@hotmail.com"
+            "hazelanddavi@gmail.com"
+        ], 
+        "Facebook": [
+            "https://www.facebook.com/pages/category/Agricultural-Service/HazelandDavisWicklowFarm/posts/"
         ], 
         "Farmers": [
             "Hazel and Davi"
+        ], 
+        "Instagram": [
+            "https://www.instagram.com/hazelanddaviswicklowfarm/"
+        ], 
+        "Next event": [
+            "Open day: 9th June 2019"
         ], 
         "Rep": [
             "Davi Leon"
         ], 
         "Website": [
-            "-"
+            "https://wicklow.farm/"
         ]
     }, 
     "publish": [
-        "no"
+        "yes"
     ], 
     "title": [
         "Hazel and Davi Wicklow CSA"

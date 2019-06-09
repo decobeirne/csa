@@ -1,6 +1,6 @@
 {
 "top": ["Update your farm profile by editing the text boxes below and clicking <b>Update farm</b> at the bottom of the page", "To undo any changes, click <b>Cancel</b> to refresh the page with the existing profile.", "After updating, you'll be able to see the changes on the <b>Farm Profiles</b> page"],
-"coords": ["Click to set your location"],
+"coordinates": ["Click on the map to set your location, or enter GPS coordinates in the text box below"],
 "publish": ["Unclick the checkbox to hide your profile", "To completely delete your profile contact admin"],
 "bottom": ["<b>Update farm</b> will save your changes to the database.", "<b>Cancel</b> will wipe all your changes and retrieve the existing farm profile from the database."],
 "add-key-value-pair": ["To add an additional key-value pair, enter the desired key in the text box and click the link underneath", "A key might be e.g. <b>Website</b> while the value might be <b>http://blahblah.com</b>"],

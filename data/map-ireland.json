@@ -1,4 +1,10 @@
 {
 "image-dimensions": ["253.38666", "317.33331"],
-"image-filename": "map-all-blank-no-dots-no-frame-fill.svg"
+"image-filename": "map-all-blank-no-dots-no-frame-fill.svg",
+"latitude-valid-limits": ["55.50", "51.40"],
+"longitude-valid-limits": ["-10.70", "-5.40"],
+"latitude-origin": "55.53309816702577",
+"latitude-scale": "0.013429567552906516",
+"longitude-origin": "-10.72951144222468",
+"longitude-scale": "0.021703522561488896"
 }

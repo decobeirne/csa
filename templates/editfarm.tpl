@@ -78,6 +78,99 @@ $(function () {
     };
 });
 
+$(function () {
+    removeCircle = function () {
+        $('.map-circle').remove();
+    };
+});
+
+$(function () {
+    mapToGps = function (mapX, mapY) {
+        // A point clicked on the map has an (x,y) coordinate, measured from the top-left of the image.
+        // The x coordinate is translated to latitude, and the y coordinate to longitude.
+
+        // latitudeOrigin (top of map) - latitude = mapY * latitudeScale
+        // latitude = latitudeOrigin - mapY * latitudeScale
+        var latitude = {{map_settings['latitude-origin']}} - mapY * {{map_settings['latitude-scale']}};
+
+        // longitude - longitudeOrigin = mapX * longitudeScale
+        // longitude = longitudeOrigin + mapX * longitudeScale
+        var longitude = {{map_settings['longitude-origin']}} + mapX * {{map_settings['longitude-scale']}};
+        return [latitude, longitude];
+    };
+});
+
+$(function () {
+    gpsToMap = function (gpsLatitude, gpsLongitude) {
+        // A point clicked on the map has an (x,y) coordinate, measured from the top-left of the image.
+        // The x coordinate is translated to latitude, and the y coordinate to longitude.
+
+        // latitudeOrigin (top of map) - latitude = mapY * latitudeScale
+        // mapY = (latitudeOrigin - latitude) / latitudeScale
+        var mapY = ({{map_settings['latitude-origin']}} - gpsLatitude) / {{map_settings['latitude-scale']}};
+
+        // longitude - longitudeOrigin = mapX * longitudeScale
+        // mapX = (longitude - longitudeOrigin) / longitudeScale
+        var mapX = (gpsLongitude - {{map_settings['longitude-origin']}}) / {{map_settings['longitude-scale']}};
+        return [mapX, mapY];
+    };
+});
+
+$(function () {
+    checkGpsCoords = function (gpsLat, gpsLong) {
+        var gpsLatFloat = parseFloat(gpsLat);
+        var gpsLongFloat = parseFloat(gpsLong);
+        if (isNaN(gpsLatFloat) || isNaN(gpsLongFloat)) {
+            return false;
+        }
+
+        // Check that latitude is within {{map_settings['latitude-valid-limits'][0]}},{{map_settings['latitude-valid-limits'][1]}}
+        // Check that longitude is within {{map_settings['longitude-valid-limits'][0]}},{{map_settings['longitude-valid-limits'][1]}}
+        if ((gpsLat < {{map_settings['latitude-valid-limits'][1]}} || gpsLat > {{map_settings['latitude-valid-limits'][0]}}) ||
+            (gpsLong < {{map_settings['longitude-valid-limits'][0]}} || gpsLong > {{map_settings['longitude-valid-limits'][1]}})) {
+            return false;
+        }
+        return true;
+    };
+});
+
+$(function () {
+    checkMapCoords = function (mapX, mapY) {
+        if ((mapX < 0 || mapX > {{map_settings['image-dimensions'][0]}}) ||
+            (mapY < 0 || mapY > {{map_settings['image-dimensions'][1]}})) {
+            return false;
+        }
+        return true;
+    };
+});
+
+$(function () {
+    setGpsCoords = function () {
+        // If enter key is pressed, then update coords in SVG map
+        var input = $('#edit-farm-coords-input');
+        var report = $('#edit-farm-coords-report');
+        var inputText = input.val();
+        var gpsCoords = inputText.split(",");
+        if (gpsCoords.length == 2) {
+            if (checkGpsCoords(gpsCoords[0], gpsCoords[1])) {
+                var mapCoords = gpsToMap(gpsCoords[0], gpsCoords[1]);
+                if (checkMapCoords(mapCoords[0], mapCoords[1])) {
+                    addCircle(mapCoords[0], mapCoords[1]);
+                    input.val(gpsCoords[0] + "," + gpsCoords[1]);
+                    var reportText = "Map location [" + mapCoords[0].toFixed(3) + "," + mapCoords[1].toFixed(3) + "], GPS coordinates [" + parseFloat(gpsCoords[0]).toFixed(3) + "," + parseFloat(gpsCoords[1]).toFixed(3) + "]";
+                    report.text(reportText);
+                } else {
+                    report.text("Something went wrong. GPS coords look OK, but map location could not be established");
+                }
+            } else {
+                report.text("GPS coords do not seem to be within permitted bounds");
+            }
+        } else {
+            report.text("GPS coords don't seem to be in a correct format, should be e.g. 53.123,-6.123");
+        }
+    };
+});
+
 $(document).ready(function(){
     // Make inputs for adding a new key-value pair clickable
     $('.new-subkey').keypress(function (e) {
@@ -85,6 +178,17 @@ $(document).ready(function(){
         if(key == 13) {
             addKeyValuePair(e.target);
             return false;
+        }
+    });
+
+    // Do not submit the form when the user hits enter. Allow enter to be used on:
+    // * Text areas
+    // * The input for setting the GPS coordinates
+    // * The input for adding a new key-value pair.
+    // https://stackoverflow.com/questions/895171/prevent-users-from-submitting-a-form-by-hitting-enter/11560180
+    $(document).on("keyup keydown keypress", ":input:not(textarea,.new-subkey,#edit-farm-coords-input)", function(event) {
+        if (event.key == "Enter") {
+            event.preventDefault();
         }
     });
 
@@ -101,29 +205,56 @@ $(document).ready(function(){
         var circleX = (evtRelX / canvasElem.clientWidth) * {{map_settings['image-dimensions'][0]}};
         var circleY = (evtRelY / canvasElem.clientHeight) * {{map_settings['image-dimensions'][1]}};
 
-        var input = $('#editfarm-coords-container').children('input:first');
-        input.val(circleX + ',' + circleY);
+        //var input = $('#edit-farm-coords-container-id').children('input:first');
+        var input = $('#edit-farm-coords-input');
+        var report = $('#edit-farm-coords-report');
 
-        addCircle(circleX, circleY);
-    });
-    
-    $('.edit-farm-coords-text').keypress(function (e) {
-        // If enter key is pressed, then update coords in SVG map,
-        // and store in ??????
-    });
-    $('.edit-farm-coords-text').on('keyup', function (e) {
-        if (e.keyCode == 13) {
-            // If enter key is pressed, then update coords in SVG map,
-            // and store in ??????
-            
-            
+        var gpsCoords = mapToGps(circleX, circleY)
+        if (checkGpsCoords(gpsCoords[0], gpsCoords[1])) {
+            addCircle(circleX, circleY);
+            var coordsText = gpsCoords[0] + "," + gpsCoords[1];
+            input.val(coordsText);
+            var reportText = "Map location [" + circleX.toFixed(3) + "," + circleY.toFixed(3) + "] set to GPS coordinates [" + gpsCoords[0].toFixed(3) + "," + gpsCoords[1].toFixed(3) + "]";
+            report.text(reportText);
+        } else {
+            removeCircle();
+            input.val("");
+            var reportText = "Map location [" + circleX.toFixed(3) + "," + circleY.toFixed(3) + "] could not be set to GPS coordinates";
+            report.text(reportText);
         }
     });
     
-    % coords = content.get('coords', [''])[0].split(',')
-    % if len(coords) == 2:
-        addCircle({{coords[0]}}, {{coords[1]}});
+    $('.edit-farm-coords-input').keypress(function (e) {
+        // If enter key is pressed, then update coords in SVG map,
+        // and store in ??????
+    });
+    
+    $('#edit-farm-coords-input').keypress(function (e) {
+        var key = e.which;
+        if(key == 13) {
+            setGpsCoords();
+            // Do not propagate
+            return false;
+        }
+    });
+
+    var input = $('#edit-farm-coords-input');
+    var report = $('#edit-farm-coords-report');
+    var coordsText = "";
+    var reportText = "GPS coordinates or map location are not set";
+    % gpsCoords = content.get('coordinates', [''])[0].split(',')
+    % if len(gpsCoords) == 2:
+        if (checkGpsCoords({{gpsCoords[0]}}, {{gpsCoords[1]}})) {
+            var mapCoords = gpsToMap({{gpsCoords[0]}}, {{gpsCoords[1]}});
+            if (checkMapCoords(mapCoords[0], mapCoords[1])) {
+                addCircle(mapCoords[0], mapCoords[1]);
+                coordsText = {{gpsCoords[0]}} + "," + {{gpsCoords[1]}};
+                reportText = "Map location [" + mapCoords[0].toFixed(3) + "," + mapCoords[1].toFixed(3) + "], GPS coordinates [" + {{gpsCoords[0]}}.toFixed(3) + "," + {{gpsCoords[1]}}.toFixed(3) + "]";
+            }
+        }
     % end
+    input.val(coordsText);
+    report.text(reportText);
 });
 </script>
 
@@ -155,8 +286,9 @@ $(document).ready(function(){
             <p class="edit-farm-key">{{title}}</p>
             <p class="edit-farm-instruction">{{!instruction}}</p>
 
-            %if key == 'coords':
-            <div class="edit-farm-coords-container" id="editfarm-coords-container">
+            %if key == 'coordinates':
+            % coords = content.get('coordinates', [''])[0]
+            <div class="edit-farm-coords-container" id="edit-farm-coords-container-id">
                 <!-- The exact dimensions of the SVG map are required to display and scale correctly. -->
                 <!-- These should be written into the json file from which map_settings is read. -->
                 % dimensions = map_settings['image-dimensions']
@@ -167,10 +299,14 @@ $(document).ready(function(){
                         <image id="edit-farm-map-img" width="{{dimensions[0]}}" height="{{dimensions[1]}}" xlink:href="{{root_rel_dir}}images/map/{{map_settings['image-filename']}}"></image>
                     </svg>
                 </div>
-
-                % coords = content.get('coords', [''])[0]
-                <input type="hidden" name="coords" value="{{coords}}">
             </div>
+            <p class="edit-farm-instruction" id="edit-farm-coords-report"></p>
+            <div class="input-container">
+                <input type="text" name="coordinates" id="edit-farm-coords-input" value="{{coords}}">
+            </div>
+            <p>
+                <span class="edit-farm-control" onclick="setGpsCoords()">Set GPS coordinates</span>
+            </p>
             % elif key in checkbox_inputs:
             % checked = "checked" if (content.get(key, ["no"])[0] == "yes") else ""
             <div class="input-container">

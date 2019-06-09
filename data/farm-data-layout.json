@@ -1,5 +1,5 @@
 {
-"order": ["publish", "title", "coords", "images", "info", "description"],
+"order": ["publish", "title", "coordinates", "images", "info", "description"],
 "single-value-inputs": ["title"],
 "checkbox-inputs": ["publish"],
 "nested-inputs": ["info"],

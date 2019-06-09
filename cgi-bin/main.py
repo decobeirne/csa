@@ -121,18 +121,24 @@ def __route_farms():
 def farms():
     permissions_dict = datautils.get_permissions_dict()
     titles = {}
-    coords = {}
+    coords_strs = {}
     for farmname in permissions_dict['farms']:
         farm_content = datautils.get_farm_content(farmname)
         titles[farmname] = farm_content['title'][0]
-        coords[farmname] = farm_content.get('coords', [''])[0].split(',')
+        coords_strs[farmname] = farm_content.get('coordinates', [''])[0]
     map_settings = json.load(open(os.path.join(DATA_DIR, MAP_SETTINGS_FILE), 'rb'))
 
     def get_farm_title(farmname):
         return titles.get(farmname, farmname.capitalize())
 
     def get_farm_coords(farmname):
-        return coords.get(farmname, [''])
+        gps_coords_str = coords_strs.get(farmname, '')
+        gps_coords_str = datautils.validate_gps_string(gps_coords_str, map_settings)
+        gps_coords = gps_coords_str.split(',')
+        if len(gps_coords) == 2:
+            map_coords = datautils.gps_to_map(gps_coords[0], gps_coords[1], map_settings)
+            return map_coords
+        return ''
 
     return sessionutils.render_template(
         'farms',
@@ -329,6 +335,12 @@ def editfarm_post(farm):
             continue
 
         values = form.getlist(key)
+
+        # Validate entered coordinates, and set to empty string if not OK
+        if main_key == "coordinates":
+            map_settings = json.load(open(os.path.join(DATA_DIR, MAP_SETTINGS_FILE), 'rb'))
+            updated_content[main_key] = [datautils.validate_gps_string(values[0], map_settings)]
+            continue
 
         if main_key in nested_inputs:
             # For nested data, the "input" in the form is given the name "main-key$sub-key", e.g. "info$website"

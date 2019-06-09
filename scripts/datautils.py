@@ -25,6 +25,49 @@ def setup_logging():
 
 
 #
+# GPS
+#
+
+def validate_gps_string(gps_string, map_settings):
+    """
+    Check that the given GPS coordinate string, e.g. 53.13,-6.123 is of the correct format
+    and within the permitted bounds. Return the given string if so, otherwise an empty string.
+    """
+    gps_coords = gps_string.split(",")
+    if len(gps_coords) == 2:
+        lat = gps_coords[0]
+        long = gps_coords[1]
+        try:
+            lat_float = float(lat)
+            long_float = float(long)
+        except ValueError:
+            return ""
+        if ((lat >= map_settings['latitude-valid-limits'][1] or lat <= map_settings['latitude-valid-limits'][0]) and  # E.g. "55.50", "51.40"
+            (long >= map_settings['longitude-valid-limits'][0] or long <= map_settings['longitude-valid-limits'][1])):  # E.g. "-10.70", "-5.40"
+            return gps_string
+    return ""
+
+
+def gps_to_map(latitude, longitude, map_settings):
+    """
+    Convert GPS coordinates to map coordinates
+    """
+    # A point clicked on the map has an (x,y) coordinate, measured from the top-left of the image.
+    # The x coordinate is translated to latitude, and the y coordinate to longitude.
+    try:
+        # latitudeOrigin (top of map) - latitude = mapY * latitudeScale
+        # mapY = (latitudeOrigin - latitude) / latitudeScale
+        mapY = (float(map_settings['latitude-origin']) - float(latitude)) / float(map_settings['latitude-scale'])
+
+        # longitude - longitudeOrigin = mapX * longitudeScale
+        # mapX = (longitude - longitudeOrigin) / longitudeScale
+        mapX = (float(longitude) - float(map_settings['longitude-origin'])) / float(map_settings['longitude-scale'])
+        return (mapX, mapY)
+    except:
+        return ''
+
+
+#
 # Farm data
 #
 

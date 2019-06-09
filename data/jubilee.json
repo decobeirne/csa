@@ -1,27 +1,40 @@
 {
-    "captions": {}, 
-    "coords": [
-        "220.6552682827232,57.80537549643987"
+    "captions": {
+        "images/uploads/jubilee/Brooksdale-2_Brooke-McAllister-300x200.jpg": "Jubilee Farm CSA"
+    }, 
+    "coordinates": [
+        "54.825880,-5.824627"
     ], 
     "description": [
-        "Description coming soon"
+        "Jubilee is a Christian creation care organisation. We practice and promote care farming, community-supported agriculture (CSA), and conservation education and engagement.", 
+        "Care Farming\r\nOur care farming services focus on human health and wellbeing, notably the many benefits \u2013 physical, mental, social and spiritual \u2013 that come from working with animals, plants, soil and other people.\r\nWe offer a range of activities with small supervised groups of up to 3 individuals, or with larger groups of up to 15 people, with group leaders providing the necessary supervision while we provide the activities.  A perfect opportunity for team-building too, in idyllic and accessible surroundings.\r\nOur care farming session of up to 5 hours costs \u00a3150 per session.", 
+        "Community Supported Agriculture (CSA)\r\nThrough our CSA activities we aim to provide good, affordable food in the form of free range meat (our livestock CSA scheme from January 2018) and seasonal vegetables (our veg box CSA from summer 2019), while converting our land and production methods to organic.  CSA members will have the chance to be involved in their food production and get behind-the-scenes access and updates.  In this way, we hope to cultivate community, develop the first CSA scheme in Northern Ireland, and help put culture back into agriculture.\r\nCSA prices:\r\nQuarter pig: \u00a3119\r\nHalf a goat: \u00a3119\r\nChristmas turkey (depending on weight): \u00a360 \u2013 \u00a370\r\nWeekly veg box: \u00a38 \u2013 \u00a313", 
+        "Conservation Education and Engagement\r\nWe provide dynamic and inspiring agricultural and environmental learning sessions for individuals, families, schools, churches and community groups.   We can cater for all levels of formal education, from pre- and primary school to post-graduate and professional.\r\nWe\u2019re also available to come to you and speak at services, seminars, conferences and other events on a wide range of agricultural and environmental topics and themes.\r\nEducation prices:\r\nCurriculum-based educational visit: \u00a36 per pupil (minimum charge \u00a360)\r\nFarm tour: \u00a34 per person (minimum charge \u00a340)\r\nSpeaking/presentation: \u00a380 per hour plus travel expenses (minimum charge \u00a350)"
     ], 
-    "images": [], 
+    "images": [
+        "images/uploads/jubilee/Brooksdale-2_Brooke-McAllister-300x200.jpg"
+    ], 
     "info": {
         "Address": [
             "Larne, Co. Antrim"
         ], 
         "CSA pickup location": [
-            "-"
+            "The collection day and time is Thursday afternoon from 1 - 5pm. Veg can either be collected from our main collection point at Jubilee Farm, 50 Glenburn road, Glynn, BT40 3JY or from our Whitehead collection point at The Mindful Store, 20 Balmoral Avenue, Whitehead, BT38 9QD (inside the Whitehead Community Development Association building)."
         ], 
         "Contact phone": [
-            "-"
+            "00 44 (0)78 580 984 79"
         ], 
         "Email": [
-            "-"
+            "mail@jubilee.coop"
         ], 
         "Farmers": [
-            "-"
+            "Malcolm"
+        ], 
+        "Next event": [
+            "Bioblitz Festival 2019: Friday 21 June 5pm til late; Saturday 22 June 9am-5pm; Free Park&Ride from Larne Rugby Club"
+        ], 
+        "Podcast": [
+            "Jonny is a regular contributor on the Farmerama podcast"
         ], 
         "Rep": [
             "Jonny Hanson"
