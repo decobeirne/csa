@@ -25,7 +25,7 @@ TMP_DIR = ROOT_DIR + '/tmp'
 MAP_SETTINGS_FILE = 'map-ireland.json'  # Expected to be under DATA_DIR
 
 PUBLISHED_FARMS = []
-MAX_IMAGES_IN_SLIDESHOW = 15
+MAX_IMAGES_IN_SLIDESHOW = 10
 
 if SCRIPTS_DIR not in sys.path:
     sys.path.append(SCRIPTS_DIR)

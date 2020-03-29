@@ -175,9 +175,9 @@ def get_published_images(randomize, max_imgs):
     Get a sublist of all published images, optionally randomized"
     """
     imgs = json.load(open(os.path.join(DATA_DIR, 'published_imgs.json'), 'rb'))
-    imgs = imgs[:max_imgs]
     if shuffle:
         shuffle(imgs)
+    imgs = imgs[:max_imgs]
     return imgs
 
 
